@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CloudTech · BMad 工作流进度图</title>
+    <style>
+      :root {
+        --bg: #0a0e1a;
+        --panel: #111827;
+        --border: #1f2a44;
+        --txt: #e6edf3;
+        --dim: #8b9bb4;
+        --green: #00ff9d;
+        --cyan: #00d4ff;
+        --purple: #bd00ff;
+        --orange: #ff9500;
+        --pink: #ff006e;
+        --yellow: #ffd60a;
+        --mint: #06ffa5;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: var(--bg);
+        color: var(--txt);
+        font-family:
+          "Segoe UI",
+          -apple-system,
+          "Microsoft YaHei",
+          sans-serif;
+        line-height: 1.5;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 4px;
+        border-left: 4px solid var(--cyan);
+        padding-left: 12px;
+      }
+      .site-hd { position: relative; padding-right: 300px; margin: 10px 0 0; }
+      .site-titles { min-width: 0; }
+      .percent-card { position: absolute; top: 0; right: 0; overflow: hidden; background: #050000; border: 1px solid #3a0000; border-radius: 0; padding: 28px 34px; text-align: center; }
+      .percent-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.22; mix-blend-mode: overlay; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+      .pct-val { display: block; position: relative; z-index: 1; font-family: "Type 95", "Hiragino Mincho ProN", "Yu Mincho ProN", "Yu Mincho", "MS Mincho", "SimSun", "FangSong", "Times New Roman", serif; font-size: 56px; font-weight: 900; paint-order: stroke fill; -webkit-text-stroke: 2px #ff0f0f; color: #ff0f0f; line-height: 1.05; letter-spacing: 6px; filter: blur(0.6px) contrast(1.4); text-shadow: 0 2px 6px rgba(0,0,0,0.85), 0 0 3px rgba(255, 0, 0, 0.55), 0 0 12px rgba(255, 0, 0, 0.35); }
+      .pct-lbl { display: none; }
+
+      h2 {
+        font-size: 15px;
+        color: var(--cyan);
+        margin: 28px 0 10px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 6px;
+      }
+      .meta {
+        color: var(--dim);
+        font-size: 13px;
+        margin: 0 0 0 16px;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 14px 0;
+        font-size: 12px;
+        padding-right: 300px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--panel);
+      }
+      .dot {
+        width: 13px;
+        height: 13px;
+        border-radius: 3px;
+        display: inline-block;
+        border: 2px solid;
+      }
+      .scroll-wrap {
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--panel);
+        max-height: 80vh;
+        cursor: grab;
+      }
+      .scroll-wrap.panning,
+      .scroll-wrap.panning .card {
+        cursor: grabbing;
+      }
+      .scroll-wrap.panning {
+        user-select: none;
+      }
+      .lane-grid {
+        display: grid;
+        grid-template-columns: 118px repeat(7, minmax(150px, 1fr)); grid-template-rows: 46px repeat(5, minmax(150px, auto));
+        position: relative;
+        min-width: 0;
+      }
+      .corner {
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: var(--dim);
+        position: sticky;
+        left: 0;
+        background: var(--panel);
+        z-index: 3;
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .lhdr {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--yellow);
+        font-size: 13px;
+        border-bottom: 1px solid var(--border);
+        border-right: 1px solid #142038;
+      }
+      .lhdr.hot {
+        background: #1a1530;
+        color: var(--mint);
+      }
+      .lanelabel {
+        grid-column: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        text-align: center;
+        border-right: 2px solid var(--ec);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        left: 0;
+        background: var(--panel);
+        z-index: 3;
+      }
+      .lanelabel b {
+        color: var(--ec);
+      }
+      .lanelabel span {
+        color: var(--dim);
+        font-size: 11px;
+      }
+      .cell {
+        border-right: 1px dashed #142038;
+        border-bottom: 1px solid #0f1729;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        padding: 4px;
+        background: rgba(255, 255, 255, 0.012);
+      }
+      .cell[data-epic="1a"] {
+        background: rgba(0, 212, 255, 0.035);
+      }
+      .cell[data-epic="1b"] {
+        background: rgba(189, 0, 255, 0.035);
+      }
+      .cell[data-epic="2"] {
+        background: rgba(255, 149, 0, 0.035);
+      }
+      .cell[data-epic="3"] {
+        background: rgba(255, 0, 110, 0.035);
+      }
+      .cell[data-epic="4"] {
+        background: rgba(255, 214, 10, 0.035);
+      }
+      .cell[data-epic="5"] {
+        background: rgba(6, 255, 165, 0.035);
+      }
+      .card {
+        width: 104px;
+        padding: 5px 6px;
+        border-radius: 5px;
+        font-size: 11px;
+        cursor: pointer;
+        border: 2px solid var(--ec);
+        background: #0d1322;
+        color: var(--txt);
+        text-align: center;
+        transition:
+          transform 0.12s,
+          box-shadow 0.12s;
+        z-index: 2;
+        position: relative;
+      }
+      .card:hover {
+        transform: scale(1.06);
+        box-shadow: 0 0 0 2px var(--ec);
+        z-index: 5;
+      }
+      .card .num {
+        display: block;
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .card .nm {
+        display: block;
+        color: var(--dim);
+        font-size: 10px;
+        margin-top: 1px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .card.done {
+        background: #006d5b;
+        border-color: #00ff9d;
+        color: #fff;
+      }
+      .card.done .nm {
+        color: #bff5e2;
+      }
+      .card.blocked {
+        border-style: dashed;
+        border-color: #ff6b00;
+        border-width: 2px;
+        background: #3a1f0d;
+      }
+      .card.blocked .nm {
+        color: #ffcb91;
+      }
+      .card.hl {
+        box-shadow:
+          0 0 0 3px #fff,
+          0 0 14px var(--green);
+        z-index: 6;
+      }
+      .card.cur {
+        box-shadow:
+          0 0 0 3px var(--mint),
+          0 0 14px var(--mint);
+        z-index: 6;
+        animation: curPulse 1.8s ease-in-out infinite;
+      }
+      .card.cur::after {
+        content: "开发中";
+        position: absolute;
+        top: -8px;
+        right: -6px;
+        background: var(--mint);
+        color: #00140c;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 1px 5px;
+        border-radius: 8px;
+        line-height: 1.5;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+      @keyframes curPulse {
+        0%,
+        100% {
+          box-shadow:
+            0 0 0 3px var(--mint),
+            0 0 10px var(--mint);
+        }
+        50% {
+          box-shadow:
+            0 0 0 3px var(--mint),
+            0 0 22px var(--mint),
+            0 0 32px rgba(6, 255, 165, 0.45);
+        }
+      }
+      svg.links {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 1;
+        overflow: visible;
+      }
+      .link.hard {
+        stroke: #6b7a99;
+        stroke-width: 1.4;
+        fill: none;
+        opacity: 0.5;
+      }
+      .link.seq {
+        stroke: #ffd60a;
+        stroke-width: 2;
+        fill: none;
+        stroke-dasharray: 5 4;
+        opacity: 0.85;
+      }
+      .link.hl {
+        opacity: 1;
+        stroke-width: 2.8;
+        stroke: #00ff9d;
+      }
+      .link.dim {
+        opacity: 0.1;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 13px;
+        margin-top: 8px;
+      }
+      th,
+      td {
+        border: 1px solid var(--border);
+        padding: 7px 9px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: #0f1729;
+        color: var(--cyan);
+        font-weight: 600;
+      }
+      tr:nth-child(even) {
+        background: #0d1322;
+      }
+      td.l {
+        color: var(--yellow);
+        font-weight: bold;
+        text-align: center;
+        white-space: nowrap;
+      }
+      td.n {
+        text-align: center;
+        font-weight: bold;
+        color: var(--mint);
+      }
+      .hot-row {
+        background: #1a1530 !important;
+      }
+      .note {
+        background: #0f1729;
+        border-left: 3px solid var(--purple);
+        padding: 10px 14px;
+        margin: 10px 0;
+        font-size: 13px;
+        color: var(--dim);
+        border-radius: 0 4px 4px 0;
+      }
+      .keypath {
+        background: #1a0d2d;
+        border-left: 3px solid var(--pink);
+        padding: 10px 14px;
+        margin: 10px 0;
+        font-size: 13px;
+        border-radius: 0 4px 4px 0;
+      }
+      code {
+        background: #0f1729;
+        padding: 1px 5px;
+        border-radius: 3px;
+        color: var(--mint);
+        font-size: 12px;
+      }
+      .devhint { background: #0c1f18; border: 1px solid var(--mint); border-radius: 8px; padding: 12px 16px; margin: 12px 0 16px; font-size: 13px; }
+      .dh-title { display: block; color: var(--mint); font-weight: 600; margin-bottom: 10px; font-size: 12px; letter-spacing: 0.3px; }
+      .dh-story { border: 1px solid var(--ec); background: rgba(6, 255, 165, 0.06); border-radius: 4px; padding: 2px 8px; font-size: 12px; display: inline-flex; align-items: center; gap: 3px; }
+      .dh-story b { color: var(--ec); }
+      .dh-nm { color: var(--dim); margin-left: 5px; }
+      .dh-sep { color: var(--dim); }
+      .dh-empty { color: var(--dim); }
+      .dh-block { border-style: dashed; background: transparent; }
+      .dh-block b { color: var(--dim); }
+      .dh-wait { color: var(--dim); border: 1px dashed var(--dim); border-radius: 4px; padding: 1px 6px; font-size: 12px; }
+      .dh-wait-lbl { color: var(--dim); font-size: 12px; margin-right: 3px; }
+      .dh-bar-legend { display: block; font-size: 11px; color: var(--dim); margin-bottom: 6px; letter-spacing: 0.2px; }
+      .dh-bar-legend b { color: var(--green); font-weight: 600; }
+      .dh-bar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 5px; margin-bottom: 12px; }
+      .dh-bar-grp { display: inline-flex; gap: 0; }
+      .dh-bar-cell { width: 9px; height: 14px; border-radius: 2px; display: inline-block; cursor: help; }
+      .dh-bar-cell.done { background: var(--green); }
+      .dh-bar-cell.todo { background: var(--dim); opacity: 0.4; }
+      .dh-bar-cell.blocked { background: var(--orange); }
+      .dh-cols { display: flex; gap: 16px; flex-wrap: wrap; }
+      .dh-col { flex: 1 1 220px; min-width: 0; }
+      .progbar { width: 100%; margin: 4px 0 18px; padding-right: 300px; }
+      .progbar .dh-bar { margin-bottom: 0; }
+      .dh-col-h { display: block; color: var(--dim); font-size: 11px; margin-bottom: 6px; letter-spacing: 0.3px; }
+      .dh-col-row { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+      .dh-col-cards { display: flex; flex-direction: column; gap: 6px; }
+    
+      /* BMad-viz status extensions */
+      .card.pending { opacity: 0.22; }
+      .card.skipped { border-style: dotted; border-color: var(--dim); opacity: 0.32; background: #0a0e1a; }
+      .card.replaced { border-style: dashed; border-color: var(--cyan); background: #0a1a22; opacity: 0.6; }
+      .dh-bar-cell.pending { background: #2a3550; opacity: 0.35; }
+      .dh-bar-cell.skipped { background: #3a3a3a; }
+      .dh-bar-cell.replaced { background: var(--cyan); opacity: 0.55; }
+      .card { width: 140px; }
+      .nm { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .glossary { margin-top: 8px; }
+      .gl-mod { margin: 16px 0 4px; font-size: 14px; border-left: 4px solid var(--ec); padding: 2px 0 2px 10px; }
+      .gl-mod b { color: var(--ec); font-size: 15px; }
+      .gl-cnt { color: var(--dim); font-size: 12px; }
+      .gl-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+      .gl-tbl th, .gl-tbl td { border: 1px solid var(--border); padding: 4px 8px; text-align: left; vertical-align: top; }
+      .gl-tbl th { background: var(--panel); color: var(--dim); font-weight: 600; }
+      .gl-code { font-weight: 700; color: var(--cyan); white-space: nowrap; }
+      .gl-name { white-space: nowrap; color: var(--txt); }
+      .gl-desc { color: var(--dim); }
+    </style>
+  </head>
+    <header class="site-hd">
+      <div class="site-titles">
+        <h1>CloudTech · BMad 工作流进度图</h1>
+        <p class="meta">纵向 5 阶段泳道(L0->L4 工作流自上而下)· 横向 7 模块 · 同列同模块可并行 · hover 卡片高亮直连边 · 数据源 <code>bmad-help.csv</code></p>
+      </div>
+      <div class="percent-card" title="已完成技能占比">
+        <span class="pct-val" id="pct-val">-</span>
+        <span class="pct-lbl">已完成</span>
+      </div>
+    </header>
+
+    <div id="progbar" class="progbar"></div>
+
+    <div class="legend">
+      <span class="chip"><span class="dot" style="background:#006d5b;border-color:#00ff9d"></span>已完成</span>
+      <span class="chip"><span class="dot" style="background:var(--dim);opacity:.4;border-color:var(--dim)"></span>待推进</span>
+      <span class="chip"><span class="dot" style="background:#0d1322;border-color:var(--dim);opacity:.25"></span>未启动</span>
+      <span class="chip"><span class="dot" style="background:#02150e;border-color:#06ffa5;box-shadow:0 0 6px #06ffa5"></span>当前焦点</span>
+      <span class="chip"><span class="dot" style="background:#0a0e1a;border-color:var(--dim);border-style:dotted;opacity:.3"></span>跳过</span>
+      <span class="chip"><span class="dot" style="background:#0a1a22;border-color:var(--cyan);border-style:dashed"></span>Lovable 取代</span>
+      <span class="chip">── 前置依赖</span>
+    </div>
+
+
+    <h2>工作流图</h2>
+    <div id="devhint" class="devhint"></div>
+    <div class="scroll-wrap">
+      <div class="lane-grid" id="grid">
+        <svg class="links" id="links" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </div>
+
+    <h2>模块功能详表 · 缩写对照</h2>
+<div class="glossary">
+<div class="gl-mod" style="--ec:#00d4ff"><b>WDS</b> · Web Design Studio <span class="gl-cnt">(18)</span></div>
+<table class="gl-tbl"><thead><tr><th>码</th><th>技能</th><th>说明</th></tr></thead><tbody>
+<tr><td class="gl-code">AS</td><td class="gl-name">Alignment &amp; Signoff</td><td class="gl-desc">Stakeholder buy-in pitch and service agreement. Skip if building your own product.</td></tr>
+<tr><td class="gl-code">FREYA</td><td class="gl-name">Wake Freya</td><td class="gl-desc">UX Designer agent for Phases 3-4. Checks prerequisites and offers next steps.</td></tr>
+<tr><td class="gl-code">IDUN</td><td class="gl-name">Wake Idun</td><td class="gl-desc">Setup and governance agent. Interviews org to configure Agent Space and authority model.</td></tr>
+<tr><td class="gl-code">SAGA</td><td class="gl-name">Wake Saga</td><td class="gl-desc">Strategic Analyst agent for Phases 1-2. Scans repos and offers next steps.</td></tr>
+<tr><td class="gl-code">PB</td><td class="gl-name">Project Brief</td><td class="gl-desc">Define product vision positioning and success criteria. Every design decision traces back to this.</td></tr>
+<tr><td class="gl-code">PR</td><td class="gl-name">Platform Requirements</td><td class="gl-desc">Technical boundaries: platforms devices integrations constraints. Skip for simple landing pages.</td></tr>
+<tr><td class="gl-code">TM</td><td class="gl-name">Trigger Mapping</td><td class="gl-desc">Map business goals to user psychology. Create personas and score features against driving forces.</td></tr>
+<tr><td class="gl-code">CS</td><td class="gl-name">Conceptual Sketching</td><td class="gl-desc">Fast rough visual exploration before detailed specification. Skip for straightforward scenarios.</td></tr>
+<tr><td class="gl-code">DD</td><td class="gl-name">Design Delivery</td><td class="gl-desc">Validate specs are complete and package as DD yaml files for development handoff.</td></tr>
+<tr><td class="gl-code">DS</td><td class="gl-name">Design System</td><td class="gl-desc">Manage component library and design tokens. Skip if Design System Mode None.</td></tr>
+<tr><td class="gl-code">FI</td><td class="gl-name">Functional Components</td><td class="gl-desc">Extract reusable patterns from specs into component definitions. Skip if Design System Mode None.</td></tr>
+<tr><td class="gl-code">OS</td><td class="gl-name">Outline Scenarios</td><td class="gl-desc">Define user journeys as persona+goal+outcome. Each connects to a Trigger Map driving force.</td></tr>
+<tr><td class="gl-code">SB</td><td class="gl-name">Storyboarding</td><td class="gl-desc">Sequence the user journey through screens with entry points transitions and error paths. Skip for simple scenarios.</td></tr>
+<tr><td class="gl-code">SP</td><td class="gl-name">Conceptual Specifications</td><td class="gl-desc">Document every design decision for every element on every page. Developers build directly from this.</td></tr>
+<tr><td class="gl-code">VD</td><td class="gl-name">Visual Design</td><td class="gl-desc">Transform specs into styled HTML prototypes with Figma round-trips.</td></tr>
+<tr><td class="gl-code">AD</td><td class="gl-name">Agentic Development</td><td class="gl-desc">Iterative build-verify cycle with design log tracking and browser verification.</td></tr>
+<tr><td class="gl-code">AT</td><td class="gl-name">Acceptance Testing</td><td class="gl-desc">Test on real users in their environment with retrospective think-aloud sessions.</td></tr>
+<tr><td class="gl-code">PE</td><td class="gl-name">Product Evolution</td><td class="gl-desc">Continuous improvement: feedback to Trigger Map to spec update to code to verify.</td></tr>
+</tbody></table>
+<div class="gl-mod" style="--ec:#bd00ff"><b>BMM</b> · BMad Method <span class="gl-cnt">(24)</span></div>
+<table class="gl-tbl"><thead><tr><th>码</th><th>技能</th><th>说明</th></tr></thead><tbody>
+<tr><td class="gl-code">CC</td><td class="gl-name">Correct Course</td><td class="gl-desc">Navigate significant changes. May recommend start over update PRD redo architecture sprint planning or correct epics and stories.</td></tr>
+<tr><td class="gl-code">DP</td><td class="gl-name">Document Project</td><td class="gl-desc">Analyze an existing project to produce useful documentation.</td></tr>
+<tr><td class="gl-code">GPC</td><td class="gl-name">Generate Project Context</td><td class="gl-desc">Scan existing codebase to generate a lean LLM-optimized project-context.md. Essential for brownfield projects.</td></tr>
+<tr><td class="gl-code">QQ</td><td class="gl-name">Quick Dev</td><td class="gl-desc">Unified intent-in code-out workflow: clarify plan implement review and present.</td></tr>
+<tr><td class="gl-code">WD</td><td class="gl-name">Write Document</td><td class="gl-desc">Describe in detail what you want, and the agent will follow documentation best practices. Multi-turn conversation with subprocess for research/review.</td></tr>
+<tr><td class="gl-code">BP</td><td class="gl-name">Brainstorm Project</td><td class="gl-desc">Expert guided facilitation through a single or multiple techniques.</td></tr>
+<tr><td class="gl-code">CB</td><td class="gl-name">Create Brief</td><td class="gl-desc">An expert guided experience to nail down your product idea in a brief. a gentler approach than PRFAQ when you are already sure of your concept and nothing will sway you.</td></tr>
+<tr><td class="gl-code">DR</td><td class="gl-name">Domain Research</td><td class="gl-desc">Industry domain deep dive subject matter expertise and terminology.</td></tr>
+<tr><td class="gl-code">MR</td><td class="gl-name">Market Research</td><td class="gl-desc">Market analysis competitive landscape customer needs and trends.</td></tr>
+<tr><td class="gl-code">TR</td><td class="gl-name">Technical Research</td><td class="gl-desc">Technical feasibility architecture options and implementation approaches.</td></tr>
+<tr><td class="gl-code">WB</td><td class="gl-name">PRFAQ Challenge</td><td class="gl-desc">Working Backwards guided experience to forge and stress-test your product concept to ensure you have a great product that users will love and need through the PRFAQ gauntlet to determine feasibility and alignment with user needs. alternative to product brief.</td></tr>
+<tr><td class="gl-code">CU</td><td class="gl-name">Create UX</td><td class="gl-desc">Guidance through realizing the plan for your UX, strongly recommended if a UI is a primary piece of the proposed project.</td></tr>
+<tr><td class="gl-code">PRD</td><td class="gl-name">Create Edit and Review PRD</td><td class="gl-desc">Facilitated PRD workflow — create a new PRD via coached discovery, update an existing one against a change signal, or validate a finished PRD against a checklist with an HTML findings report.</td></tr>
+<tr><td class="gl-code">CA</td><td class="gl-name">Architecture</td><td class="gl-desc">Offer once requirements exist (a PRD or spec; plus UX if present) and the user is ready to move from what to how. Also offer any time independently-built parts risk diverging. Produces the architecture spine: the invariants that keep features epics and stories consistent. Comes before epics and stories and scales from a quick spine to a full architecture (brownfield: ratifies the existing codebase).</td></tr>
+<tr><td class="gl-code">CE</td><td class="gl-name">Create Epics and Stories</td><td class="gl-desc"></td></tr>
+<tr><td class="gl-code">IR</td><td class="gl-name">Check Implementation Readiness</td><td class="gl-desc">Ensure PRD UX Architecture and Epics Stories are aligned.</td></tr>
+<tr><td class="gl-code">CK</td><td class="gl-name">Checkpoint</td><td class="gl-desc">Guided walkthrough of a change from purpose and context into details. Use for human review of commits branches or PRs.</td></tr>
+<tr><td class="gl-code">CR</td><td class="gl-name">Code Review</td><td class="gl-desc">Story cycle: If issues back to DS if approved then next CS or ER if epic complete.</td></tr>
+<tr><td class="gl-code">CS</td><td class="gl-name">Create Story</td><td class="gl-desc">Story cycle start: Prepare first found story in the sprint plan that is next or a specific epic/story designation.</td></tr>
+<tr><td class="gl-code">DS</td><td class="gl-name">Dev Story</td><td class="gl-desc">Story cycle: Execute story implementation tasks and tests then CR then back to DS if fixes needed.</td></tr>
+<tr><td class="gl-code">ER</td><td class="gl-name">Retrospective</td><td class="gl-desc">Optional at epic end: Review completed work lessons learned and next epic or if major issues consider CC.</td></tr>
+<tr><td class="gl-code">QA</td><td class="gl-name">QA Automation Test</td><td class="gl-desc">Generate automated API and E2E tests for implemented code. NOT for code review or story validation — use CR for that.</td></tr>
+<tr><td class="gl-code">SP</td><td class="gl-name">Sprint Planning</td><td class="gl-desc">Kicks off implementation by producing a plan the implementation agents will follow in sequence for every story.</td></tr>
+<tr><td class="gl-code">SS</td><td class="gl-name">Sprint Status</td><td class="gl-desc">Anytime: Summarize sprint status and route to next workflow.</td></tr>
+</tbody></table>
+<div class="gl-mod" style="--ec:#06ffa5"><b>TEA</b> · Test Architecture <span class="gl-cnt">(9)</span></div>
+<table class="gl-tbl"><thead><tr><th>码</th><th>技能</th><th>说明</th></tr></thead><tbody>
+<tr><td class="gl-code">TMT</td><td class="gl-name">Teach Me Testing</td><td class="gl-desc">Teach testing fundamentals through 7 sessions (TEA Academy).</td></tr>
+<tr><td class="gl-code">CI</td><td class="gl-name">CI Setup</td><td class="gl-desc">Configure CI/CD quality pipeline.</td></tr>
+<tr><td class="gl-code">TD</td><td class="gl-name">Test Design</td><td class="gl-desc">Risk-based test planning.</td></tr>
+<tr><td class="gl-code">TF</td><td class="gl-name">Test Framework</td><td class="gl-desc">Initialize production-ready test framework.</td></tr>
+<tr><td class="gl-code">AT</td><td class="gl-name">ATDD</td><td class="gl-desc">Generate red-phase acceptance test scaffolds before implementation.</td></tr>
+<tr><td class="gl-code">NR</td><td class="gl-name">NFR Evidence Audit</td><td class="gl-desc">Audit non-functional requirement evidence.</td></tr>
+<tr><td class="gl-code">RV</td><td class="gl-name">Test Review</td><td class="gl-desc">Quality audit (0-100 scoring).</td></tr>
+<tr><td class="gl-code">TA</td><td class="gl-name">Test Automation</td><td class="gl-desc">Expand test coverage.</td></tr>
+<tr><td class="gl-code">TR</td><td class="gl-name">Traceability</td><td class="gl-desc">Coverage traceability and gate.</td></tr>
+</tbody></table>
+<div class="gl-mod" style="--ec:#ff9500"><b>CIS</b> · Creative Intelligence <span class="gl-cnt">(4)</span></div>
+<table class="gl-tbl"><thead><tr><th>码</th><th>技能</th><th>说明</th></tr></thead><tbody>
+<tr><td class="gl-code">DT</td><td class="gl-name">Design Thinking</td><td class="gl-desc">Guide human-centered design processes using empathy-driven methodologies.</td></tr>
+<tr><td class="gl-code">IS</td><td class="gl-name">Innovation Strategy</td><td class="gl-desc">Identify disruption opportunities and architect business model innovation.</td></tr>
+<tr><td class="gl-code">PS</td><td class="gl-name">Problem Solving</td><td class="gl-desc">Apply systematic problem-solving methodologies to crack complex challenges.</td></tr>
+<tr><td class="gl-code">ST</td><td class="gl-name">Storytelling</td><td class="gl-desc">Craft compelling narratives using proven story frameworks and techniques.</td></tr>
+</tbody></table>
+<div class="gl-mod" style="--ec:#8b9bb4"><b>Core</b> · Core <span class="gl-cnt">(11)</span></div>
+<table class="gl-tbl"><thead><tr><th>码</th><th>技能</th><th>说明</th></tr></thead><tbody>
+<tr><td class="gl-code">AR</td><td class="gl-name">Adversarial Review</td><td class="gl-desc">Use for quality assurance or before finalizing deliverables. Code Review in other modules runs this automatically, but also useful for document reviews.</td></tr>
+<tr><td class="gl-code">BC</td><td class="gl-name">BMad Customize</td><td class="gl-desc">Use when you want to change how an agent or workflow behaves — add persistent facts, swap templates, insert activation hooks, or customize menus. Scans what's customizable, picks the right scope (agent vs workflow), writes the override to _bmad/custom/, and verifies the merge. No TOML hand-authoring required.</td></tr>
+<tr><td class="gl-code">BH</td><td class="gl-name">BMad Help</td><td class="gl-desc"></td></tr>
+<tr><td class="gl-code">ECH</td><td class="gl-name">Edge Case Hunter Review</td><td class="gl-desc">Use alongside adversarial review for orthogonal coverage — method-driven not attitude-driven.</td></tr>
+<tr><td class="gl-code">EP</td><td class="gl-name">Editorial Review - Prose</td><td class="gl-desc">Use after drafting to polish written content.</td></tr>
+<tr><td class="gl-code">ES</td><td class="gl-name">Editorial Review - Structure</td><td class="gl-desc">Use when doc produced from multiple subprocesses or needs structural improvement.</td></tr>
+<tr><td class="gl-code">FI</td><td class="gl-name">Forge Idea</td><td class="gl-desc">Use to pressure-test and harden an idea — software, business, creative, research, or life — until it proves out, hardens into something buildable, or dies cheaply. Persona-driven interrogation; optional handoff to bmad-spec or bmad-quick-dev.</td></tr>
+<tr><td class="gl-code">ID</td><td class="gl-name">Index Docs</td><td class="gl-desc">Use when LLM needs to understand available docs without loading everything.</td></tr>
+<tr><td class="gl-code">PM</td><td class="gl-name">Party Mode</td><td class="gl-desc">Orchestrate multi-agent discussions when you need multiple perspectives or want agents to collaborate.</td></tr>
+<tr><td class="gl-code">SD</td><td class="gl-name">Shard Document</td><td class="gl-desc">Use when doc becomes too large (&gt;500 lines) to manage effectively.</td></tr>
+<tr><td class="gl-code">SP</td><td class="gl-name">Spec</td><td class="gl-desc">Use to distill any intent input (brief, PRD, transcript, brain dump, design folder, mixed multi-source) into a succinct, no-fluff SPEC.md contract + companions that downstream work derives from. Locks the WHAT before the HOW. Works for software, game design, research, editorial, policy, business, anything intent-bearing. Validation mode also available.</td></tr>
+</tbody></table>
+<div class="gl-mod" style="--ec:#ffd60a"><b>BMB</b> · BMad Builder <span class="gl-cnt">(4)</span></div>
+<table class="gl-tbl"><thead><tr><th>码</th><th>技能</th><th>说明</th></tr></thead><tbody>
+<tr><td class="gl-code">BA</td><td class="gl-name">Build an Agent</td><td class="gl-desc">Create, edit, or rebuild an agent skill through conversational discovery.</td></tr>
+<tr><td class="gl-code">BW</td><td class="gl-name">Build a Workflow</td><td class="gl-desc">Create, edit, or rebuild a workflow or utility skill.</td></tr>
+<tr><td class="gl-code">IM</td><td class="gl-name">Ideate Module</td><td class="gl-desc">Brainstorm and plan a BMad module — explore ideas, decide architecture, and produce a build plan.</td></tr>
+<tr><td class="gl-code">SB</td><td class="gl-name">Setup Builder Module</td><td class="gl-desc">Install or update BMad Builder module config and help entries.</td></tr>
+</tbody></table>
+<div class="gl-mod" style="--ec:#ff006e"><b>Loop</b> · BMAD Loop <span class="gl-cnt">(2)</span></div>
+<table class="gl-tbl"><thead><tr><th>码</th><th>技能</th><th>说明</th></tr></thead><tbody>
+<tr><td class="gl-code">SA</td><td class="gl-name">Setup Loop Module</td><td class="gl-desc">Install or update BMAD Loop module config and help entries.</td></tr>
+<tr><td class="gl-code">ST</td><td class="gl-name">Sweep Triage</td><td class="gl-desc">Read-only triage of the deferred-work ledger into a machine-readable partition. Automation-only; bmad-loop sweep invokes it.</td></tr>
+</tbody></table>
+</div>
+
+    <script>
+      const EPICS = [
+        { key: "L0", name: "L0 启动·学习", sub: "setup · anytime · learning", color: "#8b9bb4" },
+        { key: "L1", name: "L1 分析·战略", sub: "analysis · strategy", color: "#00d4ff" },
+        { key: "L2", name: "L2 规划·设计", sub: "planning · design", color: "#bd00ff" },
+        { key: "L3", name: "L3 方案·构建", sub: "solutioning · build", color: "#ff9500" },
+        { key: "L4", name: "L4 实施·演化", sub: "implementation · evolution", color: "#06ffa5" },
+      ];
+      const NL = 7;
+      const MODHDRS = ["WDS","BMM","TEA","CIS","Core","BMB","Loop"];
+      const MODCOLORS = ["#00d4ff","#bd00ff","#06ffa5","#ff9500","#8b9bb4","#ffd60a","#ff006e"];
+      const HOT = new Set();
+      // 本次开发恒定高亮的故事(批次声明 option A:裸 URL 恒定高亮;换批改 CUR 推 gh-pages)
+      // 当批(2026-07-24 声明):1a.10 模型设置
+      const CUR = new Set(["bmad-wds-trigger-mapping"]);
+
+      const NODES = [
+        // id, code, label, stage(row), module(col), status
+        ["bmad-bmb-setup", "SB", "Setup Builder Module", "L0", 5, "done"],
+        ["bmad-agent-builder", "BA", "Build an Agent", "L0", 5, "pending"],
+        ["bmad-workflow-builder", "BW", "Build a Workflow", "L0", 5, "pending"],
+        ["bmad-module-builder", "IM", "Ideate Module", "L0", 5, "pending"],
+        ["bmad-loop-setup", "SA", "Setup Loop Module", "L0", 6, "done"],
+        ["bmad-loop-sweep", "ST", "Sweep Triage", "L0", 6, "pending"],
+        ["bmad-brainstorming", "BP", "Brainstorm Project", "L1", 1, "pending"],
+        ["bmad-market-research", "MR", "Market Research", "L1", 1, "pending"],
+        ["bmad-domain-research", "DR", "Domain Research", "L1", 1, "pending"],
+        ["bmad-technical-research", "TR", "Technical Research", "L1", 1, "pending"],
+        ["bmad-product-brief", "CB", "Create Brief", "L1", 1, "pending"],
+        ["bmad-prfaq", "WB", "PRFAQ Challenge", "L1", 1, "pending"],
+        ["bmad-prd", "PRD", "Create Edit and Review PRD", "L2", 1, "pending"],
+        ["bmad-ux", "CU", "Create UX", "L2", 1, "pending"],
+        ["bmad-architecture", "CA", "Architecture", "L3", 1, "pending"],
+        ["bmad-create-epics-and-stories", "CE", "Create Epics and Stories", "L3", 1, "pending"],
+        ["bmad-check-implementation-readiness", "IR", "Check Implementation Readiness", "L3", 1, "pending"],
+        ["bmad-sprint-planning", "SP", "Sprint Planning", "L4", 1, "pending"],
+        ["bmad-sprint-status", "SS", "Sprint Status", "L4", 1, "pending"],
+        ["bmad-create-story", "CS", "Create Story", "L4", 1, "pending"],
+        ["bmad-dev-story", "DS", "Dev Story", "L4", 1, "pending"],
+        ["bmad-code-review", "CR", "Code Review", "L4", 1, "pending"],
+        ["bmad-checkpoint-preview", "CK", "Checkpoint", "L4", 1, "pending"],
+        ["bmad-qa-generate-e2e-tests", "QA", "QA Automation Test", "L4", 1, "pending"],
+        ["bmad-retrospective", "ER", "Retrospective", "L4", 1, "pending"],
+        ["bmad-document-project", "DP", "Document Project", "L0", 1, "pending"],
+        ["bmad-generate-project-context", "GPC", "Generate Project Context", "L0", 1, "pending"],
+        ["bmad-quick-dev", "QQ", "Quick Dev", "L0", 1, "pending"],
+        ["bmad-correct-course", "CC", "Correct Course", "L0", 1, "pending"],
+        ["bmad-agent-tech-writer", "WD", "Write Document", "L0", 1, "pending"],
+        ["bmad-party-mode", "PM", "Party Mode", "L0", 4, "pending"],
+        ["bmad-help", "BH", "BMad Help", "L0", 4, "pending"],
+        ["bmad-index-docs", "ID", "Index Docs", "L0", 4, "pending"],
+        ["bmad-shard-doc", "SD", "Shard Document", "L0", 4, "pending"],
+        ["bmad-editorial-review-prose", "EP", "Editorial Review - Prose", "L0", 4, "pending"],
+        ["bmad-editorial-review-structure", "ES", "Editorial Review - Structure", "L0", 4, "pending"],
+        ["bmad-review-adversarial-general", "AR", "Adversarial Review", "L0", 4, "pending"],
+        ["bmad-review-edge-case-hunter", "ECH", "Edge Case Hunter Review", "L0", 4, "pending"],
+        ["bmad-spec", "SP", "Spec", "L0", 4, "pending"],
+        ["bmad-customize", "BC", "BMad Customize", "L0", 4, "pending"],
+        ["bmad-forge-idea", "FI", "Forge Idea", "L0", 4, "pending"],
+        ["bmad-cis-innovation-strategy", "IS", "Innovation Strategy", "L0", 3, "pending"],
+        ["bmad-cis-problem-solving", "PS", "Problem Solving", "L0", 3, "pending"],
+        ["bmad-cis-design-thinking", "DT", "Design Thinking", "L0", 3, "pending"],
+        ["bmad-cis-storytelling", "ST", "Storytelling", "L0", 3, "pending"],
+        ["bmad-teach-me-testing", "TMT", "Teach Me Testing", "L0", 2, "pending"],
+        ["bmad-testarch-test-design", "TD", "Test Design", "L3", 2, "pending"],
+        ["bmad-testarch-framework", "TF", "Test Framework", "L3", 2, "pending"],
+        ["bmad-testarch-ci", "CI", "CI Setup", "L3", 2, "pending"],
+        ["bmad-testarch-atdd", "AT", "ATDD", "L4", 2, "pending"],
+        ["bmad-testarch-automate", "TA", "Test Automation", "L4", 2, "pending"],
+        ["bmad-testarch-test-review", "RV", "Test Review", "L4", 2, "pending"],
+        ["bmad-testarch-nfr", "NR", "NFR Evidence Audit", "L4", 2, "pending"],
+        ["bmad-testarch-trace", "TR", "Traceability", "L4", 2, "pending"],
+        ["bmad-wds-idun", "IDUN", "Wake Idun", "L0", 0, "done"],
+        ["bmad-wds-saga", "SAGA", "Wake Saga", "L0", 0, "done"],
+        ["bmad-wds-freya", "FREYA", "Wake Freya", "L0", 0, "done"],
+        ["bmad-wds-alignment", "AS", "Alignment & Signoff", "L0", 0, "skipped"],
+        ["bmad-wds-project-brief", "PB", "Project Brief", "L1", 0, "done"],
+        ["bmad-wds-trigger-mapping", "TM", "Trigger Mapping", "L1", 0, "todo"],
+        ["bmad-wds-platform-requirements", "PR", "Platform Requirements", "L1", 0, "pending"],
+        ["bmad-wds-outline-scenarios", "OS", "Outline Scenarios", "L2", 0, "todo"],
+        ["bmad-wds-conceptual-sketching", "CS", "Conceptual Sketching", "L2", 0, "pending"],
+        ["bmad-wds-storyboarding", "SB", "Storyboarding", "L2", 0, "pending"],
+        ["bmad-wds-conceptual-specs", "SP", "Conceptual Specifications", "L2", 0, "todo"],
+        ["bmad-wds-functional-components", "FI", "Functional Components", "L2", 0, "pending"],
+        ["bmad-wds-visual-design", "VD", "Visual Design", "L2", 0, "pending"],
+        ["bmad-wds-design-system", "DS", "Design System", "L2", 0, "skipped"],
+        ["bmad-wds-design-delivery", "DD", "Design Delivery", "L2", 0, "todo"],
+        ["bmad-wds-agentic-development", "AD", "Agentic Development", "L3", 0, "replaced"],
+        ["bmad-wds-usability-testing", "AT", "Acceptance Testing", "L3", 0, "pending"],
+        ["bmad-wds-product-evolution", "PE", "Product Evolution", "L3", 0, "pending"],
+      ];
+
+      // [from, to, type]
+      const E = [
+        ["bmad-product-brief", "bmad-prd"],
+        ["bmad-prd", "bmad-ux"],
+        ["bmad-architecture", "bmad-create-epics-and-stories"],
+        ["bmad-create-epics-and-stories", "bmad-check-implementation-readiness"],
+        ["bmad-sprint-planning", "bmad-sprint-status"],
+        ["bmad-sprint-planning", "bmad-create-story"],
+        ["bmad-create-story", "bmad-dev-story"],
+        ["bmad-dev-story", "bmad-code-review"],
+        ["bmad-dev-story", "bmad-qa-generate-e2e-tests"],
+        ["bmad-code-review", "bmad-retrospective"],
+        ["bmad-testarch-test-design", "bmad-testarch-framework"],
+        ["bmad-testarch-framework", "bmad-testarch-ci"],
+        ["bmad-create-story", "bmad-testarch-atdd"],
+        ["bmad-testarch-atdd", "bmad-testarch-automate"],
+        ["bmad-testarch-automate", "bmad-testarch-test-review"],
+        ["bmad-testarch-automate", "bmad-testarch-nfr"],
+        ["bmad-testarch-test-review", "bmad-testarch-trace"],
+        ["bmad-wds-project-brief", "bmad-wds-trigger-mapping"],
+        ["bmad-wds-project-brief", "bmad-wds-platform-requirements"],
+        ["bmad-wds-trigger-mapping", "bmad-wds-outline-scenarios"],
+        ["bmad-wds-outline-scenarios", "bmad-wds-conceptual-sketching"],
+        ["bmad-wds-outline-scenarios", "bmad-wds-storyboarding"],
+        ["bmad-wds-outline-scenarios", "bmad-wds-conceptual-specs"],
+        ["bmad-wds-conceptual-specs", "bmad-wds-functional-components"],
+        ["bmad-wds-conceptual-specs", "bmad-wds-visual-design"],
+        ["bmad-wds-functional-components", "bmad-wds-design-system"],
+        ["bmad-wds-conceptual-specs", "bmad-wds-design-delivery"],
+        ["bmad-wds-design-delivery", "bmad-wds-agentic-development"],
+        ["bmad-wds-agentic-development", "bmad-wds-usability-testing"],
+        ["bmad-wds-usability-testing", "bmad-wds-product-evolution"],
+      ];
+
+      const svgNS = "http://www.w3.org/2000/svg";
+      function el(t, cls, html) {
+        const e = document.createElement(t);
+        if (cls) e.className = cls;
+        if (html != null) e.innerHTML = html;
+        return e;
+      }
+
+      const grid = document.getElementById("grid");
+      const epicIdx = {};
+      EPICS.forEach((e, i) => (epicIdx[e.key] = i));
+
+      // corner
+      const corner = el("div", "corner");
+      corner.textContent = "Layer →";
+      corner.style.gridRow = "1";
+      grid.appendChild(corner);
+      // layer headers
+      for (let l = 0; l < NL; l++) {
+        const h = el("div", "lhdr" + (HOT.has(l) ? " hot" : ""));
+        h.textContent = (MODHDRS[l] || ("L" + l));
+        h.style.gridColumn = l + 2;
+        h.style.gridRow = "1";
+        grid.appendChild(h);
+      }
+      // lane rows
+      EPICS.forEach((ep, ei) => {
+        const lab = el("div", "lanelabel");
+        lab.style.setProperty("--ec", ep.color);
+        lab.style.gridRow = ei + 2;
+        lab.innerHTML = "<b>" + ep.name + "</b><br><span>" + ep.sub + "</span>";
+        grid.appendChild(lab);
+        for (let l = 0; l < NL; l++) {
+          const cell = el("div", "cell");
+          cell.style.setProperty("--ec", ep.color);
+          cell.style.gridColumn = l + 2;
+          cell.style.gridRow = ei + 2;
+          cell.dataset.epic = ep.key;
+          grid.appendChild(cell);
+        }
+      });
+
+      // place cards
+      const cellMap = {};
+      NODES.forEach((n) => {
+        const k = n[3] + "_" + n[4];
+        (cellMap[k] = cellMap[k] || []).push(n);
+      });
+      NODES.forEach((n) => {
+        const cell = grid.querySelector('.cell[data-epic="' + n[3] + '"]');
+        // need correct layer cell: select by grid row/col? cells appended in order per epic row, so index by layer
+      });
+      // better: locate cell by epic + layer via children order
+      EPICS.forEach((ep, ei) => {
+        const cells = grid.querySelectorAll('.cell[data-epic="' + ep.key + '"]');
+        for (let l = 0; l < NL; l++) {
+          const list = cellMap[ep.key + "_" + l] || [];
+          list.forEach((n) => {
+            const c = el("div", "card " + n[5] + (CUR.has(n[0]) ? " cur" : ""));
+            c.id = "s" + n[0];
+            c.style.setProperty("--ec", MODCOLORS[n[4]]);
+            c.innerHTML =
+              '<span class="num">' + n[1] + '</span><span class="nm">' + n[2] + "</span>";
+            cells[l].appendChild(c);
+          });
+        }
+      });
+
+      // draw links
+      const svg = document.getElementById("links");
+      function drawLinks() {
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+        const gr = grid.getBoundingClientRect();
+        svg.setAttribute("width", grid.scrollWidth);
+        svg.setAttribute("height", grid.scrollHeight);
+        E.forEach((e) => {
+          const a = document.getElementById("s" + e[0]);
+          const b = document.getElementById("s" + e[1]);
+          if (!a || !b) return;
+          const ra = a.getBoundingClientRect();
+          const rb = b.getBoundingClientRect();
+          const x1 = ra.right - gr.left;
+          const y1 = ra.top - gr.top + ra.height / 2;
+          const x2 = rb.left - gr.left;
+          const y2 = rb.top - gr.top + rb.height / 2;
+          const dx = Math.max(36, Math.abs(x2 - x1) * 0.45);
+          const d =
+            "M " +
+            x1 +
+            " " +
+            y1 +
+            " C " +
+            (x1 + dx) +
+            " " +
+            y1 +
+            ", " +
+            (x2 - dx) +
+            " " +
+            y2 +
+            ", " +
+            x2 +
+            " " +
+            y2;
+          const p = document.createElementNS(svgNS, "path");
+          p.setAttribute("d", d);
+          p.setAttribute("class", "link " + (e[2] === "seq" ? "seq" : "hard"));
+          p.dataset.from = e[0];
+          p.dataset.to = e[1];
+          svg.appendChild(p);
+        });
+      }
+
+      requestAnimationFrame(() => {
+        drawLinks();
+        // re-draw on resize / font load
+        setTimeout(drawLinks, 200);
+      });
+      window.addEventListener("resize", drawLinks);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawLinks);
+
+      // 可开发故事提示框 + 架构推进度条:
+      //   进度条 = 全 story 按拓扑层 L0->L16 分组排列(组内无缝/组间留白),位置=层 色=状态 -> 形状即推进度(形式即内容);
+      //   左列可开发(status=todo 且入边全 done),右列阻塞(status=blocked + blocker pill);合并后改 NODES status->done 自动刷新
+      (function renderDevHint() {
+        const done = {};
+        NODES.forEach((n) => (done[n[0]] = n[5] === "done"));
+        const incoming = {};
+        E.forEach((e) => ((incoming[e[1]] = incoming[e[1]] || []).push(e[0])));
+        const numOrd = (label) => { const m = String(label).match(/(\d+)$/); return m ? +m[1] : 0; };
+        const byLayer = (a, b) => a[4] - b[4] || numOrd(a[1]) - numOrd(b[1]);
+        const epColor = (n) => (MODCOLORS[n[4]] || "var(--dim)");
+
+        // 进度条: 按 layer 分组,组内无缝 组间 gap(绿带=层段;形式即内容:形状=推进度)
+        const counts = { done: 0, todo: 0, blocked: 0 };
+        const grp = {};
+        NODES.forEach((n) => { (grp[n[4]] = grp[n[4]] || []).push(n); });
+        const barHtml = Object.keys(grp).map((L) => +L).sort((a, b) => a - b).map((L) =>
+          '<span class="dh-bar-grp">' + grp[L].sort(byLayer).map((n) => {
+            counts[n[5]] = (counts[n[5]] || 0) + 1;
+            return '<span class="dh-bar-cell ' + n[5] + '" title="' + n[1] + ' ' + n[2] + '"></span>';
+          }).join("") + '</span>'
+        ).join("");
+
+        // 左列: 可推进 (todo 且入边全 done)
+        const dev = NODES.filter((n) => n[5] === "todo" && (incoming[n[0]] || []).every((d) => done[d])).sort(byLayer);
+        const col1 = dev.length
+          ? '<div class="dh-col"><span class="dh-col-h">可推进 (' + dev.length + ')</span><div class="dh-col-cards">' +
+            dev.map((n) => '<div class="dh-col-row"><span class="dh-story" style="--ec:' + epColor(n) + '"><b>' + n[1] + '</b><span class="dh-nm">' + n[2] + '</span></span></div>').join("") + '</div></div>'
+          : "";
+
+        // 右列: 阻塞 (blocked + blocker pill)
+        const blocked = NODES.filter((n) => n[5] === "blocked").sort(byLayer);
+        const col2 = blocked.length
+          ? '<div class="dh-col"><span class="dh-col-h">阻塞 (' + blocked.length + ')</span><div class="dh-col-cards">' +
+            blocked.map((n) => {
+              const wait = (incoming[n[0]] || []).filter((d) => !done[d]).map((d) => (NODES.find((x) => x[0] === d) || [])[1]).filter(Boolean);
+              const w = wait.length ? '<span class="dh-wait-lbl">等</span>' + wait.map((x) => '<span class="dh-wait">' + x + '</span>').join('<span class="dh-sep">/</span>') : "";
+              return '<div class="dh-col-row"><span class="dh-story dh-block" style="--ec:' + epColor(n) + '">⏳<b>' + n[1] + '</b><span class="dh-nm">' + n[2] + '</span></span>' + w + '</div>';
+            }).join("") + '</div></div>'
+          : "";
+
+        const box = document.getElementById("devhint");
+        if (!box) return;
+        if (!dev.length && !blocked.length) {
+          box.innerHTML = '<span class="dh-title">🚀 可推进技能 · 下一步</span><span class="dh-empty">全部已完成 🎉</span>';
+          return;
+        }
+        const legend = '<span class="dh-bar-legend">进度 <b>' + counts.done + '/' + NODES.length + '</b> 已完成 · ' + counts.todo + ' 待推进 · ' + counts.blocked + ' 阻塞</span>';
+        const pct = NODES.length ? Math.round((counts.done / NODES.length) * 100) : 0;
+        const CN = ["零","一","二","三","四","五","六","七","八","九"];
+        const numToCn = (n) => { if (n === 0) return "零"; if (n >= 100) return "一百"; const t = Math.floor(n / 10), u = n % 10; return (t > 0 ? (t === 1 ? "" : CN[t]) + "十" : "") + (u > 0 ? CN[u] : ""); };
+        const pctEl = document.getElementById("pct-val");
+        if (pctEl) { pctEl.textContent = "百分之" + numToCn(pct); pctEl.title = counts.done + "/" + NODES.length + " 已完成 (" + pct + "%)"; }
+        const bar = '<div class="dh-bar">' + barHtml + '</div>';
+        const cols = '<div class="dh-cols">' + col1 + col2 + '</div>';
+        const prog = document.getElementById("progbar");
+        if (prog) { prog.innerHTML = legend + bar; }
+        box.innerHTML = '<span class="dh-title">🚀 可推进技能 · 下一步(左=可推进 / 右=阻塞;状态更新后自动刷新)</span>' + (prog ? "" : legend + bar) + cols;
+      })();
+
+      // "当前:"散文里的"本次开发"片段由 CUR 派生(永不再手改该行,避开 en-dash Edit 失配)
+      (function renderCurProse() {
+        const span = document.getElementById("cur-prose");
+        if (!span) return;
+        if (!CUR.size) { span.textContent = ""; return; }
+        const items = [...CUR].map((id) => {
+          const n = NODES.find((x) => x[0] === id);
+          return n ? n[1] + "(" + n[2] + ")" : id;
+        });
+        span.textContent = ";当前焦点 " + items.join(" + ") + (CUR.size > 1 ? "并行" : "");
+      })();
+
+      // hover highlight + grab-to-pan on blank
+      const wrap = document.querySelector(".scroll-wrap");
+      let pan = null;
+
+      function clearHover() {
+        document
+          .querySelectorAll(".link.hl,.link.dim")
+          .forEach((p) => p.classList.remove("hl", "dim"));
+        document.querySelectorAll(".card.hl").forEach((c) => c.classList.remove("hl"));
+      }
+
+      // 左键按下空白处 -> 手掌形态,拖拉移动画布
+      wrap.addEventListener("mousedown", (ev) => {
+        if (ev.button !== 0) return; // 仅左键
+        if (ev.target.closest(".card")) return; // 卡片不触发拖动
+        // 点在滚动条上不触发
+        if (
+          ev.target === wrap &&
+          (ev.offsetX > wrap.clientWidth || ev.offsetY > wrap.clientHeight)
+        )
+          return;
+        pan = { x: ev.clientX, y: ev.clientY, sl: wrap.scrollLeft, st: wrap.scrollTop };
+        clearHover();
+        wrap.classList.add("panning");
+        ev.preventDefault();
+      });
+      window.addEventListener("mousemove", (ev) => {
+        if (!pan) return;
+        wrap.scrollLeft = pan.sl - (ev.clientX - pan.x);
+        wrap.scrollTop = pan.st - (ev.clientY - pan.y);
+      });
+      window.addEventListener("mouseup", () => {
+        if (!pan) return;
+        pan = null;
+        wrap.classList.remove("panning");
+      });
+
+      wrap.addEventListener("mouseover", (ev) => {
+        if (pan) return; // 拖动中不触发 hover
+        const card = ev.target.closest(".card");
+        if (!card) return;
+        const id = card.id.slice(1);
+        document.querySelectorAll(".link").forEach((p) => {
+          if (p.dataset.from === id || p.dataset.to === id) p.classList.add("hl");
+          else p.classList.add("dim");
+        });
+        document.querySelectorAll(".card").forEach((c) => {
+          if (c === card) c.classList.add("hl");
+        });
+      });
+      wrap.addEventListener("mouseout", (ev) => {
+        if (pan) return;
+        if (!ev.target.closest(".card")) return;
+        clearHover();
+      });
+    </script>
+  </body>
+</html>
