@@ -59,7 +59,10 @@ working_relationship:
 # --- Build agent (replaces Phase 5 wds-5-agentic-development) ---
 build:
   agent: lovable
-  stack: [React, Vite, TypeScript, Tailwind, shadcn/ui, Supabase]
+  stack: [React, Vite, TypeScript, Tailwind, shadcn/ui, Supabase]  # full-vision 栈(Supabase = v1.x+)
+  # MVP 栈(elicitation 2026-08-02 决策: 单用户+离线硬约束 -> Supabase 非必需, 推 v1.x+;
+  # profile/XP = 纯本地 IndexedDB/localStorage). 详见 _bmad-output/project-context.md ADR-3
+  stack_mvp: [React, Vite, TypeScript, Tailwind, shadcn/ui]
   integration_model: >
     WDS Phase 0-4 产出设计规格; Lovable 在 Phase 3-4 作为渲染探针(spec<->render
     循环确定 UX); Lovable 取代 Phase 5 作为构建 agent; Phase 6/7 跳过(shadcn 由 Lovable 带)。
@@ -69,7 +72,7 @@ phases:
   0-setup: complete
   1-project-brief: complete
   2-trigger-map: complete          # full strategic analysis
-  3-scenarios: pending
+  3-scenarios: complete
   4-ux-design: pending            # Lovable render loop here
   5-build: lovable                # replaced by Lovable
   6-design-system: skipped        # mode=none + shadcn via Lovable

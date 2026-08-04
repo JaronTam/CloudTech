@@ -1,7 +1,7 @@
 # CloudTech - 项目记忆
 
-**最后更新:** 2026-08-02 (Phase 2 Trigger Map COMPLETE, step-01..09f, 含 mermaid 实渲染补强; 下一步 Phase 3 UX Scenarios)
-**状态:** Phase 2 (Trigger Map) - COMPLETE (step-01..09f, S mode, 2026-08-02; 含 mermaid 实渲染验证补强). 下一步 Phase 3 UX Scenarios (Freya).
+**最后更新:** 2026-08-04 (Phase 3 step-09 handover 完成: design intent 收齐 01=S/04=S/02=C/03=C + 4 scenario outline frontmatter 写入; Phase 3 COMPLETE; 02.2 待补 Phase 4)
+**状态:** Phase 3 (UX Scenarios) COMPLETE - step-01~09 done (4/4 outline + overview + quality review Excellent + handover; design_intent 01=S/04=S/02=C/03=C 已写入 4 scenario outline frontmatter). 02.2 step spec 待补(Phase 4 随 scenario 02 起手补, 不阻). 下一步 = Phase 4 UX Design (Lovable render loop, wds-4-ux-design, C 序 01->04->02->03, 设计循环从 scenario step 1 起: 首站 01.1 课程地图). Phase 2 (Trigger Map) COMPLETE.
 
 ---
 
@@ -35,7 +35,7 @@ CloudTech = **个人用游戏化学习工具**(数字/web), 参照 **AWS Builder
 ## 3. 技术与流程配置
 
 方法论 WDS v6 | project_type greenfield | complexity complex | tech React+Vite+shadcn/ui+Tailwind | design_system_mode none(shadcn 由 Lovable 带) | product_languages [zh,en] | comm/doc 语言 Chinese | brief_level complete | strategic_analysis full | root_folder design-process | stakes personal-hobby。
-Lovable 集成: Phase 0-4 出规格; Phase 3-4 渲染探针(spec<->render); 取代 Phase 5; Phase 6/7 跳过。栈 React+Vite+TS+Tailwind+shadcn+Supabase。
+Lovable 集成: Phase 0-4 出规格; Phase 3-4 渲染探针(spec<->render); 取代 Phase 5; Phase 6/7 跳过。栈(full-vision) React+Vite+TS+Tailwind+shadcn+Supabase; **MVP 栈剔除 Supabase**(elicitation 2026-08-02 决策: 单用户+离线硬约束 -> Supabase 非必需, 推 v1.x+; profile/XP=纯本地 IndexedDB/localStorage; 详见 _bmad-output/project-context.md ADR-3)。
 
 ---
 
@@ -46,7 +46,7 @@ Lovable 集成: Phase 0-4 出规格; Phase 3-4 渲染探针(spec<->render); 取�
 | 0 Setup | complete |
 | 1 Product Brief (Saga) | complete |
 | 2 Trigger Map (Saga) | complete - step-01..09f 完成(S mode, 2026-08-02; 含 mermaid 实渲染验证补强) |
-| 3 Scenarios (Freya) | pending |
+| 3 Scenarios (Freya) | complete - step-01~09 (4/4 outline + overview + quality review Excellent + handover; design_intent 01=S/04=S/02=C/03=C; 02.2 step spec 待补 Phase 4, 2026-08-04) |
 | 4 UX Design (Freya <-> Lovable) | pending |
 | 5 Build | lovable (取代) |
 | 6 Design System | skipped |
@@ -116,19 +116,46 @@ Lovable 集成: Phase 0-4 出规格; Phase 3-4 渲染探针(spec<->render); 取�
 
 ```
 C:\Two\CloudTech\
-+-- design-process/
++-- design-process/                      (WDS 制品根)
 |   +-- _progress/
 |   |   +-- 00-design-log.md             <- 进度(live tracker)
 |   |   +-- wds-project-outline.yaml     <- 配置 source of truth (勿改)
 |   |   +-- project-memory.md            <- 本文件
-|   |   +-- phase2-decisions.md          <- [Phase2] 决策详细+过关条件备选库(§8)
-|   |   +-- resume-prompt.md             <- 次日继续提示词
-|   +-- A-Product-Brief/ 01-product-brief.md   [Phase1 产物]
-|   +-- B-Trigger-Map/ 00-trigger-map.md        (Phase 2, Saga, complete)
-|   +-- C-UX-Scenarios/ ... (Phase 3-4, Freya)
-+-- _bmad/wds/config.yaml
-+-- docs/ (AWS BuilderCards Rules.pdf, swimlane-*.md)
-+-- C:\tmp\ (buildercards.html/.txt, newsd.html, wechat-article.html/.txt, site-*.html)
+|   |   +-- resume-prompt.md             <- 新会话恢复提示词
+|   |   +-- phase2-decisions.md          <- [Phase2] 决策详单+过关备选库(§8) [冻结]
+|   |   +-- tech-stack-review-2026-08-01.md <- [Phase2 step-05] 技术栈复查 [冻结]
+|   |   +-- mermaid-render-verify-2026-08-01.md <- [Phase2] mermaid 实渲染验证 [冻结]
+|   |   +-- validate-mermaid.js          <- mermaid 验证脚本
+|   |   +-- agent-experiences/           <- 设计讨论压缩洞察(日期文件)
+|   +-- A-Product-Brief/                 [Phase1 产物]
+|   |   +-- 00-product-brief.md          <- WDS 模板初版
+|   |   +-- 01-product-brief.md          <- 定稿(完整战略基础)
+|   +-- B-Trigger-Map/                   (Phase 2, Saga, complete)
+|   |   +-- 00-trigger-map.md (+.svg)    <- hub
+|   |   +-- 01-Business-Goals.md
+|   |   +-- 02-Jaron-the-Dual-Track-Apprentice.md
+|   |   +-- 05-Key-Insights.md
+|   |   +-- 06-Feature-Impact.md
+|   +-- C-UX-Scenarios/                  (Phase 3 COMPLETE, Freya)
+|   |   +-- 00-ux-scenarios.md           <- overview(step-06)
+|   |   +-- 01-jaron-builds-validates-stack/ (outline + 01.1-01.4 step spec)
+|   |   +-- 02-jaron-selects-track-onboards/ (outline + 02.1; 02.2 待补 Phase4)
+|   |   +-- 03-jaron-reviews-architecture-compares-clouds/ (outline + 03.1)
+|   |   +-- 04-jaron-manages-saves-progress/ (outline + 04.1)
+|   +-- D-Design-System/                 (Phase 6 skipped; 00-design-system.md 空 scaffold)
++-- _bmad-output/                        (BMAD 产物根)
+|   +-- project-context.md               <- AI agent 规则(canonical, cat1-7+ADR)
+|   +-- project-context.cat6-audit.md    <- cat6 审计登记册(历史快照)
+|   +-- project-context.conflicts-audit.md <- 冲突登记册(历史快照)
+|   +-- implementation-artifacts/        <- 空(scaffold 后填充)
+|   +-- planning-artifacts/              <- 空
+|   +-- test-artifacts/                  <- 空
++-- _bmad/                               (BMAD v6.10.0, tracked)
++-- .agents/ .claude/ .cline/ skills/    (gitignored, 可重装)
++-- .github/agents/                      (tracked, agent 定义; 无 workflows)
++-- docs/                                (AWS BuilderCards Rules.pdf, swimlane-*.md)
++-- site/index.html                      (进度图, gh-pages orphan)
++-- C:\tmp\                              (外部存档: buildercards/newsd/wechat 等, 临时区可能清理)
 ```
 
 ---
@@ -257,3 +284,134 @@ C:\Two\CloudTech\
 **正例对照(§12#2, 过四项 + 预算)**: S3 = 金库领主(安全可靠, 取物收传送税); R2 = 自贸港主(免传送税, 兼容金库口令)。只保留 3 个核心映射(存储安全 / 传出流量费有无 / API 兼容), 每词承载一映射, 无多余奇幻层; 头衔 2 词(金库领主 / 自贸港主), 简洁度对齐战士 / 圣骑士。
 
 **适用**: Phase 3-4 每个 gamification 映射(spec / 角色 / 机制)上线前过四项检测 + 定量预算; 过拟合 = 废弃重做, 不靠加修饰补救。
+
+
+## 14. Phase 3 进度与开放问题（Session 8, 2026-08-03, Freya; step-02->04 补录）
+
+> 补录: step-02~04 决策原于对话进行、2026-08-03 据 handoff 重建落盘 (经 Trigger Map/产品简报交叉验证). step-05~09 见下方各场景条目 + Session 12.
+
+**进度:**
+- step-01 load-context COMPLETE (上下文摘要呈交, fresh-start 确认).
+- step-02 analyze-scope CONFIRMED: 4 归属问题已决 -> 11 候选视图收敛为 8 页 + 非页表面 (见下页清单).
+- step-03 build-strategic-context COMPLETE: 4 strategic context chains (BG->persona->force->transaction), Decision Matrix 7 问/chain, 页分配, coverage 8/8.
+- step-04 suggest-scenarios COMPLETE (USER APPROVED): 4 场景, C 序 (覆盖默认优先序).
+- step-05~08 done: 4/4 场景 outline (01 全4步 + 04 outline+04.1 + 02 outline+02.1 + 03 outline+03.1; 02.2 step spec 待补 Phase 4) + step-06 overview + step-07 quality review(4 场景全 Excellent, 阈值全过无修法) + step-08 log. step-09 handover 进行中(暂停于 design intent 选择, 待用户选每场景 [K/C/S/D/L]; 选完写 frontmatter + Phase 4 说明 + 标 complete + [M]). 详见本节末 Session 12. 2 Phase-4 working assumption(通关总结 per-level+W2/P2轨末标记; XP固定/多参考等权)见 01.4 spec.
+
+**页清单 (step-02 确认, 11->8):**
+- 8 页: #1 总览 | #2 选角+选轨 | #3 课程地图 | #4 画布(核心) | #5 牌池 | #6 XP/进阶 | #7 对比记忆 | #8 Profile/存档
+- 非页表面(不入页清单): 校验结果=overlay on #4 | onboarding=mode(track-agnostic,首玩关 profile skip) | 通关总结=Tier-3 overlay on #6 + #6 徽记 | 4 关卡(W1/W2/P1/P2)=template+variants(=#4 画布 instances) | 牌面=template(component) | 准入=#4-entry guard(source-agnostic) | 降级态=#4 fault state
+
+**step-04 已批方案 (C 序 = 创建序, Q2=2b 锁定):**
+- 01 Jaron 组装并校验云架构栈 [P1] 页 #3 #4 #5 #6  <- 首序
+- 04 Jaron 管理存档与进度 [P3] 页 #8  <- 第2序: 锁 schema 供 02 消费
+- 02 Jaron 选轨并首次上手 [P2] 页 #1 #2
+- 03 Jaron 回顾架构与多云对比 [P2] 页 #7
+
+**锁定决策 (8 关键 + 修法):**
+1. Q1=1a: memory(#7) 纯读, 产 no save-data
+2. Q3=3a: 单 XP=WA (降级态 halt accepted + visible report; 3b 拆 mastery/progression 延 Phase 4, hinge B1 表达力/降级频率)
+3. Q2=2b: 单序 C = 创建序 01 core -> 04 save -> 02 entry -> 03 memory (schema-lock via save 第二; 覆盖 step-05 默认优先序)
+4. FS1=A: memory 读 passes-only (牌组历史 仅成功态); 降级->校验日志(dev); 角色分离 memory=user passes / 校验日志=dev failures+降级
+5. MAINTAIN P2: C1(entry) 留 P2 (设计依赖强制 core 先; Cl1 结构半须折入 01-core 早设计, mode 半入 02-entry)
+6. 准入 = #4-entry guard: source-agnostic, derived from unlock invariant (required_cards ⊆ unlocked_cards, 纯函数 XP->牌), 非 #3-only; #1/#3 仅显示
+7. 阈值不变量: pass N(min WA) -> unlock N+1 cards, 可单测(JSON fixture); per-track XP(战士XP/圣骑XP)
+8. 决策A(step-05 01.3): 校验触发=手动提交 CTA(非自动即放即校验), 对齐轴A正判断练习(build then validate); 自动即放即校验=预empt判断, 否决
+
+修法: 弃局 S3(认输+揭示参考架构, gating N 失败, peek-then-pass=自欺 MVP 受/v1.x) | reset 护栏 G4(danger-zone)+G2(type-confirm)+G3(export-first) | onboarding=mode(track-agnostic) | #11=Tier-3 overlay+#6 徽记 | #6 校验=overlay on #4 | 双语=always-on 内容(非 setting toggle)
+
+**Spec carry-overs (入 step-05+ detail, 不阻 outlining):**
+- 跨链契约 CS1: C1<->C2 路由(选轨->首玩关) | C2<->C3 reflect(pass->review) | C3<->C2 return(review->retry) | C2<->C4 save(auto/manual)
+- schema 归属 CS3: #8(04) 拥 profile/XP schema; #5/#6(01) 经 invariant 消费
+- 进度单一真源 CS6: #6(01 XP) 权威; #1/#8 派生
+- GS1(新): 双角色 IA - role-separation 须 UI 明示 dual-role Jaron 导航(failures->校验日志 / passes->memory)
+- GS3: reset/import per-store scope(牌组历史+校验日志)
+- 残余簇: Cl1(onboarding 不对称,圣骑 P1 陡) | Cl2(W1->W2 B1/B3 预教) | Cl4(W1 校验薄) | Cl5(窄屏/CJK) | Cl6(#7 可跳过) | Cl11(per-level 画布态) | FS2(memory comparison 瞬态,accepted) | FS3(3a hinge 降级频率,延 B1) | NC1(peek 自欺 MVP 受) | NS3/NS4(per-level state/level identity) | CS4/CS5/CS7
+
+**流程提醒:**
+- wds-3-scenarios = step-file 架构, 严格按序; step-02/04 = user checkpoint (均已过).
+- WDS 制品根 = design-process/; config.output_folder=_bmad-output 是 bmad 输出目录, 两者不同; step 文件内 {output_folder} 按 design-process/ 解析.
+- 当前: Phase 3 step-01~08 done (4/4 outline + overview step-06 + quality review step-07 Excellent + log step-08); step-09 handover 暂停于 design intent 选择. 详见上方进度 + 本节末 Session 12.
+**10 人模拟发现 (2026-08-03, 场景 01+04 outline 后):**
+> 10 edge-case 用户走 01+04 流程. sunshine path 全成立无 mid-flow 死端; 缺口集中终端态+边缘态+Phase-4 细节.
+
+已决(按推荐):
+- B1+B2 全通关终端态: 01.1 全通关态 display(无未通关关)+01.4 Tier-3 escalated overlay on #6(第3层 terminal, O1 达成). 落 01.4 Phase-4 flagged.
+- C1 弃局后 flow: on-page retry(揭示后重试, peek-then-pass 自欺 MVP 受 NC1). 落 01.3 spec.
+- D1 校验日志 audience: user-visible 诊断详情(owner 可见, 非 dev-only; 与牌组历史 passes 分离). 解 FS1=A "dev" 歧义. 落 04.1 spec.
+- F1 降级态 exit: halt 后 = retry submit / 离开回 #3(不进 01.4). 落 01.3 spec.
+- H1 Cl5 carry-over: 落 01.3 spec carry-overs.
+
+延 Phase 4 open issues (tracked, 不阻 outline):
+- A1 初始解锁集(XP=0 各轨解锁牌) / A2 per-track unlock 独立性(战士 XP 是否解锁圣骑牌)
+- C2 弃局 N 值(几次失败解锁弃局)
+- E1 reset 粒度(full/per-track/per-store) [耦合 X1/X2 carry-over 矛盾: CS6 不写-XP vs reset/import 写-XP / GS3 scope(history+logs) vs 解锁纯函数 reset-改-XP; 同决] / E2 G3 export-first 失败处理 / E3 export 范围与机制(localStorage+IndexedDB 合并) / E4 import 原子性(部分坏 all-or-nothing) / E5 钳制反馈(silent/warn) / E6 schema_version 迁移
+- G1 守序 lawful 触发条件(两轨 started vs passed) / G2 守序 partial states display
+- I1 首玩 flow 依赖 scenario 02(C 序 known gap)
+**场景 04 复查 (2026-08-03, 继 10 人模拟):**
+- X3(D1 传导 outline Q1/Q8/carry-over)/X4(GS1 "双角色"->"passes/failures 数据角色") 已修(含 04.1 Page Purpose 残留 dev/双角色).
+- X1(CS6 不写-XP vs reset/import 写-XP)/X2(GS3 scope vs 解锁纯函数 reset-改-XP) = 耦合 E1(reset 粒度), Phase 4 同决, 不自动改.
+- 画布态缺口 [复查-C1] 决 = A: per-level 进行中草稿 = 第 3 个 IndexedDB store(画布态/草稿, auto-save CS1 C2↔C4, resume); #8 view/export/import/reset 纳入; 3 store 3 角色(passes/failures/drafts)不混. 改 ADR-6 + 04 outline/04.1 spec + CS3(拥画布态 schema) + GS3(scope+画布态) + FS1=A(3 角色) + CS1(画布 auto/manual 写画布态 store). X1/X2 仍随 E1.
+- N1(画布态 import 信任边界, 复查新增): import 信任边界 2 类(Zod schema + 上限钳制) -> 3 类, +画布态 graph 校验(nodes≤32[project-context L53 规模封顶] / cards ⊆ unlocked[锁定决策6 准入 invariant, 纯函数派生] / valid edges[NODES/E from-to 引用现存 node]). 改 04 outline+04.1 carry-over(2 处) + 传导枚举位(Q1/Q8 outline + Page Purpose/On-Page 04.1, X3 先例; Q7 商业成功留 shorthand). graph 校验失败处理耦合 E4(import 原子性 all-or-nothing 含画布态) + A2(cards ⊆ unlocked 须选定 per-track unlocked 集), Phase 4 同决. 无冲突(E4 正交互补 / 解锁纯函数一致 / nodes<=32 既有).
+
+**场景 02 outline + 复查 (2026-08-04, Session 9 续, Freya; Suggest mode):**
+> 场景 02 选轨+首次上手 [P2, C 序第3] 页 #1 总览+#2 选角选轨. Suggest 模式 8 问 + 2 轮 10 人模拟 + 复查闭环. I1 首玩 flow 在此消解.
+
+outline (02-jaron-selects-track-onboards/) + 首步 02.1 auto-processed (02.1-overview/). 决策:
+- Q1=A: Q2 lead O3(primary 可用工具形态) + O1 启动(flywheel step 1 选轨->首玩关); distinct 于 01(掌握行为 O1)
+- Q2=A: Q8 step2 选角=选轨 paired 单步(warrior=战士轨/paladin=圣骑轨); character-track skin-vs-slice 机制=Phase-4 open(feature #13 选角=皮肤+切片)
+- I1 消解: onboarding=mode(track-agnostic, 无独立 gate); profile 首玩关 auto-create=profile 不存在时[R1], idempotent[R7]
+
+10 人模拟 R1-R11 (2 轮, 修订后无回归):
+- R1 auto-create 条件=profile 不存在时 | R2 pre-profile 选角态 ephemeral(无新 store) | R3 #2 两态(first-pick/returning-pick) | R4 #2 entry bar 难度明示(Cl1 display facet) | R5 Cl5 扩 02 + always-on 双语 apply | R6 #1 三态(zero/progress/terminal)
+- R7 auto-create idempotent(atomic check-then-create 防 double) | R8 CS1 C1<->C2 routing 契约(02.2 传 track+entry level W1/P1 -> 01.1) | R9 #2 UI paired 明示+character 来回切 | R10 #2 无 forced default track | R11 A1 须含首关参考架构所需牌(W1 S3+CloudFront / P1 EC2+VPC+EBS)
+
+复查 (2026-08-04) 发现+修:
+- C1 跨场景冲突[已修 01]: 01 outline Q6+01.1 Entry 原"开应用落 #3/应用落地 #3"(C 序先建 01 时 01.1 当首步遗留) vs 02 确立"开应用落 #1 总览(hub, 所有态)". 修 01 outline Q6+CS1 + 01.1 Entry/Q6/Purpose/Q3 -> "#1->导航 #3"(returning)/"from 02.2 handoff"(first-time). 全 C-UX-Scenarios 扫旧 entry 短语=零残留.
+- G1 跨场景缺口[已修 01.1]: 01.1 仅述 returning entry(选未通关关), 缺 first-time entry(从 02.2 track+level 预选). 修 01.1 Page Purpose+Entry 增两 entry state + 加 Spec Carry-overs section.
+- T1 传导: R8 -> 01.1 entry-state 依赖(first-time 预选 vs returning 选). 02 outline CS1 注 + 01.1 Carry-overs(T1/CS1 R8/准入 guard/A1 R11) + 01 outline CS1 交叉引用.
+- T2 传导: 04.1 onboarding=mode 精化(R1 profile 不存在时 + R7 idempotent, 详 02).
+- T3 澄清: Cl1 双 facet - 结构 facet(课程结构 P1 陡 vs W1 缓)设计在 01-core(锁定决策5); display facet(entry bar 难度明示)在 02 R4, 依赖 01 结构设计(Phase-4 难度量化). 非冲突.
+- index 同步: 00-ux-scenarios.md 02 Status->DONE(02.1) + C 序标签修正(02=第3/03=第4, 原 index 写反) + Page Index +02.1.
+- minor: 01.1 C1 note 改述避旧词("应用落地 #3"->"非应用首落页", 消 grep 假阳性) + T1 记法统一("[T1 传导]").
+
+Phase-4 open (02 新增, tracked, 不阻 outline):
+- A1 内容(XP=0 各轨解锁牌, 含首关所需)[R11 传导]
+- profile.class 双轨语义 + 第二轨/改选转换(warrior+paladin=both->lawful)[耦合 [守序]+A2]
+- skin-vs-slice character 机制(feature #13 选角=皮肤+切片)[Q2=A 传导]
+- entry bar 难度量化(关卡设计 dep)[R4 传导]
+- terminal #2 行为(全通关后选角选轨 replay/locked)[耦合 01.4 全通关态]
+- reset 后 onboarding re-trigger[耦合 E1 reset 粒度]
+- auto-create 字段集 match CS3 schema(确认非新决)
+
+**场景 03 outline + 10人模拟 (2026-08-04, Session 11, Freya; Suggest mode):**
+> 场景 03 回顾架构与多云对比 [P2, C 序第4] 页 #7 对比记忆. Suggest 模式 8 问 + 3 处 review 展开 + 10 人模拟. FS1=A 读 passes-only.
+
+outline (03-jaron-reviews-architecture-compares-clouds/) + 首步 03.1 auto-processed (03.1-comparison-memory/). 决策:
+- Q2=O1 巩固层 (distinct 01 O1 ENGINE Must / 02-04 O3 plumbing): 驱动 forces 轴B 记忆+轴D 可迁移 = 学习 outcome 语义; feature priority(#6 Must)!=业务目标归属; Cl6 可跳过=巩固 aid 非 gate
+- 3 处 review (展开后按推荐): (1) Q2 O1 巩固(vs O3) (2) 多云变体 MVP scope=两层全愿景, MVP floor=轴B(AWS passes+图谱映射+EN/CN), 轴D 层 Phase-4(GCP/CF 后扩激活) (3) 图谱->架构图映射: 结构半 outline 定(映射存在+对象=passed graph->matched reference), 视觉半 Phase-4
+
+10 人模拟 S1-S6 (无回归):
+- S1 zero-passes empty state(#7 从 #1 nav 可达 zero passes->empty state redirect #2/#3) | S2 passes store schema 依赖(须记 graph+matched ref+WA, carry CS3/#8) | S3 多云变体 absent-state(MVP AWS-only, Phase-4) | S4 terminal review(couples 01.4 全通关态, Phase-4) | S5 01.4 通关总结 vs #7 review 边界(per-pass 即时 vs cross-pass 巩固, distinct) | S6 pass-write 时点+#4->#7 路径(CS1 C2<->C3 #4->#7 direct 须 pass 已在 store)
+- S6 修法[已传导 01.3]: pass 写入 passes store at #4(validation pass=immediate record: graph+matched ref+WA), decoupled from #6 XP award(#6 awards XP from WA via transition, 不读 passes store; passes store IndexedDB 写 at #4 供 #7/#8 读 / XP localStorage #6 写, 分属不冲突). #4 有 optional #7 review exit(CS1 C2<->C3)+sunshine #6 exit. 改 01.3 spec carry-overs(+pass-write-at-#4 note+#4->#7 exit) + 03 outline carry-over(+S6). CS3/#8 schema: passes store write at #4(verify with 04).
+- 确认无问题: Cl6 skip #7 sunshine 闭环 / CS1 C3<->C2 retry 画布态 restore / FS1=A read consistency(#7/#8 共读 passes, #7 纯读) / FS2 transient(每次 view 重读无 stale vs #8 reset) / CS6(#7 不 touch XP) / #7 drafts-but-no-passes(FS1=A 读 passes-only, draft 不显示) / always-on 双语+Cl5 apply.
+
+Phase-4 open (03 新增, tracked, 不阻 outline):
+- 多云变体 MVP scope(轴D 层 GCP/CF 后扩激活, milestone-dep)[处2]
+- 图谱->架构图映射 粒度/呈现/交互(视觉半)[处3]
+- #7 内容派生(passes store->展示哪些: 通关架构列表/图谱重放/变体对比面板)
+- terminal review state(couples 01.4 全通关态)[S4]
+- 多云变体 absent-state 设计(MVP AWS-only)[S3]
+- CN 概念锚 content(S12#2 design seeds, S3=金库领主 等)
+
+复查 (2026-08-04, 本轮自查): S6 note 修正(#6 reads pass -> #6 awards XP from WA via transition, 不读 passes store; 01.3/03 outline/mem 3 文件已修) + S2 传导 04(passes store schema 字段 graph+matched ref+WA, 04 outline carry-overs 已加). 无冲突(8 锁定决策/CS1/CS6/FS1=A/Cl6/FS2 全过). 完整度: 03 outline 8 问全 + 03.1 boilerplate 全 + index + 3 进度文件. 10 人模拟 1 轮(02 做 2 轮; S6 fix additive 无回归风险, case 10 #4->#7 direct 修后 pass).
+
+**Session 12 (2026-08-04, step-06~08, Freya):**
+- step-06 overview: 00-ux-scenarios.md 重生成(Scenario Summary 表+4 场景卡[链接+User/Business Value]+Page Coverage Matrix 8/8+非页表面 tracked+Page Spec Index+Next Phase). 链接校验 4/4 解析 0 断链. 未改 scenario 文件.
+- step-07 quality review: 4 场景全 Excellent(Complete 7/7·Quality 7/7·Mistakes 7/7[含 3.7 bloated]·Practices 4/4). 阈值全过无修法. 复核: Trigger 三元(折入 Q3)齐 / 4 路径线性零 if / 共享页一致 / 单 persona. tracked(非阻塞): 02.2 step spec 待补(Phase 4) / 03 business success 偏定性.
+- step-08: design-log+本文件+resume-prompt 回写. Phase 3 step-01~08 done. step-09 handover 进行中(暂停于 design intent 选择, 见 header 状态) -> Phase 4 UX Design(Lovable render loop, 设计循环从 scenario step 1 起).
+**Session 13 (2026-08-04, step-09 handover 完成 -> Phase 3 COMPLETE, Freya):**
+- step-09 DONE: completion summary 呈交 + design intent 收齐(01=S, 04=S, 02=C, 03=C) + 4 scenario outline frontmatter 写入(YAML 块置顶: design_intent + design_status:not-started).
+- Phase 3 COMPLETE (step-01~09). design-log/project-memory/resume-prompt 回写; Current 表登记 Phase 4 待启动.
+- design intent->workflow 映射(wds-4-ux-design): S=workflow-suggest.md / C=workflow-conceptualize.md.
+- 复查(本会话): 9/9 step 全过 + 12 产物 + frontmatter 4/4 + 跨场景契约(CS1/CS3/CS6/GS1/GS3/FS1=A)分布合理(04.x schema owner 持最多) + 共享页 #1 hub 一致 + 02.2 待补单点 tracked. 无阻塞.
+- 下一步 Phase 4 UX Design: C 序 01 起手, 首站 01.1 课程地图(S 模式, page-specification.template + Trigger Map 轴A). 02.2(#2 选角选轨)随 scenario 02 起手补. Lovable render loop 皮/骨分层(ADR-4); 过拟合红线 §13 每 gamification 映射过四项检测.

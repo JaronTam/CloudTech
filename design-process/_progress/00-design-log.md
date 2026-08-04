@@ -12,7 +12,7 @@
 
 - [x] Complete product brief - Phase 1
 - [x] Define trigger map - Phase 2 (complete: step-01..09f, 2026-08-02)
-- [ ] Create user scenarios - Phase 3
+- [x] Create user scenarios - Phase 3 (complete: step-01~09 done; 4/4 outline + overview + quality review Excellent + handover; design_intent 01=S/04=S/02=C/03=C; 02.2 step spec 待补 Phase 4, 2026-08-04)
 
 ---
 
@@ -23,6 +23,8 @@
 | Phase 0: Project Setup | 2026-07-27 | facilitator - DONE |
 | Phase 1: Project Brief | 2026-07-28 | Saga - DONE |
 | Phase 2: Trigger Map | 2026-07-29 | Saga - DONE (2026-08-02, step-01..09f) |
+| Phase 3: UX Scenarios | 2026-08-04 | Freya - COMPLETE (step-01~09; 4/4 outline + overview + quality review Excellent + handover; design_intent 01=S/04=S/02=C/03=C; 02.2 待补 Phase 4) |
+| Phase 4: UX Design | pending | Freya <-> Lovable - 待启动 (C 序 01.1 课程地图起手, design_intent 01=S/04=S/02=C/03=C, Lovable render loop) |
 
 **Rules:** Mark what you start. Complete it when done (move to Log). One task at a time per agent.
 
@@ -33,10 +35,20 @@
 > Per page design progress. Updated by agents at every design transition.
 
 | Scenario | Step | Page | Status | Updated |
+> _Phase 4 UX Design 启动后逐页填充（Phase 3 仅 scenario outline，不产生逐页设计条目）。_
 
 **Status values:** `discussed` -> `wireframed` -> `specified` -> `explored` -> `building` -> `built` -> `approved` | `removed`
 
 ---
+
+## About This Folder
+
+- **This file** - Single source of truth for project progress
+- **agent-experiences/** - Compressed insights from design discussions (dated files)
+- **wds-project-outline.yaml** - Project configuration from Phase 0 setup (勿改)
+- **project-memory.md** - Consolidated project memory + open questions (session handoff)
+- **phase2-decisions.md** - Phase 2 决策详细 + 过关条件备选库
+- **resume-prompt.md** - Prompt to resume in a fresh context
 
 ## Log
 
@@ -173,11 +185,97 @@
 
 ---
 
-## About This Folder
+### 2026-08-03 - Phase 3 UX Scenarios 启动 (Session 8, Freya)
 
-- **This file** - Single source of truth for project progress
-- **agent-experiences/** - Compressed insights from design discussions (dated files)
-- **wds-project-outline.yaml** - Project configuration from Phase 0 setup (勿改)
-- **project-memory.md** - Consolidated project memory + open questions (session handoff)
-- **phase2-decisions.md** - Phase 2 决策详细 + 过关条件备选库
-- **resume-prompt.md** - Prompt to resume in a fresh context
+**Agent:** Freya (WDS Designer)
+**Persona:** 1 (Jaron - 双轨学徒, PRIMARY)
+
+**进度:**
+- step-01 load-context COMPLETE: 读全 Product Brief + Trigger Map hub + persona + business-goals + feature-impact + key-insights + project-context + project-memory. 上下文摘要呈交, fresh-start 确认 (00-ux-scenarios.md = WDS 预置空 scaffold). 菜单 C 进 step-02.
+- step-02 analyze-scope 已呈交 USER CHECKPOINT (未确认): Site Type=Dynamic App; 11 候选视图; Scale=Small; Mode=Suggest; Format=Storyboard+ScreenFlow(onboarding).
+- 用户选择延后决 4 个 page-panel/template 归属问题, wrap 本次 session.
+
+**4 个待决归属问题 (下次先决):**
+1. #5 牌池/#6 校验结果/#8 对比记忆 = 独立 page vs 画布 panel/overlay?
+2. 4 关卡 (W1/W2/P1/P2) = 独立 page vs template+variants?
+3. #10 Onboarding = 独立 vs 并入 W1 on-ramp?
+4. #11 通关总结 = 独立 vs 并入 #7/总览?
+
+**Next:** 决 4 归属问题 -> 确认 scope -> step-03 build strategic context (wds-3-scenarios step-file 架构).
+
+### 2026-08-03 - Phase 3 step-02->04 COMPLETE (Session 8 续, Freya) [补录]
+
+> step-02 确认 -> step-03 -> step-04 原于对话进行未落盘; 本条据 handoff summary 重建补录(同日). 经 Trigger Map/产品简报交叉验证一致.
+
+- step-02 CONFIRMED: 4 归属问题已决, 11 候选视图收敛 8 页 + 非页表面(校验 overlay on #4 / onboarding mode / Tier-3 overlay on #6 / 4 关卡 template / 牌面 template / 准入 #4-entry guard / 降级态).
+- step-03 COMPLETE: 4 strategic context chains, Decision Matrix 7 问/chain, 页分配 coverage 8/8.
+- step-04 COMPLETE (USER APPROVED): 4 场景, C 序(创建序 01->04->02->03, 覆盖默认优先序, schema-lock).
+- 7 锁定决策: Q1=1a(memory 纯读) / Q3=3a(单 XP=WA, 降级 halt) / Q2=2b(C 序) / FS1=A(memory 读 passes-only+角色分离) / MAINTAIN P2(C1 entry 留 P2) / 准入=#4-entry guard(source-agnostic) / 阈值不变量(pass N->unlock N+1, per-track XP). 修法: 弃局 S3 / reset 护栏 G4+G2+G3 / onboarding=mode / #11 Tier-3 overlay / 双语 always-on.
+- Spec carry-overs 入 step-05 detail: CS1(跨链契约)/CS3(schema 归属 #8)/CS6(进度单一真源 #6)/GS1(双角色 IA)/GS3(reset per-store) + 残余簇 Cl1/Cl2/Cl4/Cl5/Cl6/Cl11/FS2/FS3/NC1/NS3/NS4/CS4/CS5/CS7.
+- 7 次模拟 + 5+ 定向深挖(10 人模拟多轮/序对比/弃局/FS1/NS1-2/NC2 深挖)全过. 详 project-memory §14.
+
+**Next:** step-05 outline 场景 01 (Suggest 模式), C 序续 04->02->03.
+### 2026-08-03 - Phase 3 step-05 场景 01 outline + 01.1 (Freya)
+
+- step-05 outline-scenario 启动, Suggest 模式. 场景 01 (C 序首, P1) 8 问全答呈审 -> 用户确认.
+- 场景 01 = Jaron 组装并校验云架构栈; 页 #3->#5->#4->#6 (Q8 序: 牌池在画布前=先看可用牌再组装); 交易=组装+双层校验(A3+B1+B3)判断合理性; 目标 O1; persona Jaron(PRIMARY).
+- 产物: C-UX-Scenarios/01-jaron-builds-validates-stack/01-jaron-builds-validates-stack.md (outline, 5119B) + 01.1-course-map/ (首步 auto-processed, 1813B) + Sketches/. 00-ux-scenarios.md 索引更新.
+- 质量门预检过(8 问具体/mental 具象/entry 含 device/线性零分支/双方可测/名含 persona/Trigger Map 显式).
+- carry-overs tracked: CS1/CS3/CS6/Cl1-结构半/Cl2/Cl4/NS1/NS3/NS4.
+- 本次 session 先补录 step-02->04 落盘(project-memory §14/design-log/resume-prompt) 再开 step-05; 用户要求 wrap, 新窗口继续.
+
+**Next (新窗口):** step-05 场景 01 step menu(1=outline 01.2 牌池 / 2=start designing) -> C 序续 04->02->03 -> 全 4 场景 outline 完 [C] step-06.
+### 2026-08-03 - Phase 3 step-05 场景 01 全4步 + 场景 04 + 10人模拟 + 复查 + N1 (Session 8 续->9, Freya) [补录]
+
+> 继 design-log 上一条(场景 01 outline+01.1)后, 多 session 工作未逐条落盘; 本条据 project-memory §14 + handoff 重建补录(同日).
+
+- 场景 01 (C 序首, P1) 续 outline 01.2-01.4 DONE: 01.2 牌池(只读盘点, 不加规划态) + 01.3 画布(决策A=手动提交校验CTA; 弃局 C1=on-page retry NC1; 降级 F1=halt->retry/回#3; Cl5 CJK H1) + 01.4 XP/进阶(固定XP聚合; 通关总结per-level; B1+B2全通关=全通关态display+Tier-3 overlay on #6, Phase-4 flagged). 全 4 步 outline 完.
+- 场景 04 (C 序第2=schema-lock, P3) outline + 04.1 DONE: 单页#8; 3 IndexedDB store(牌组历史passes/校验日志failures+降级/画布态草稿per-level, ADR-6); GS1 passes/failures角色分离; D1校验日志owner可见诊断详情(非dev-only); export/import/reset(G3+G2+G4).
+- 10人模拟(场景01+04 outline后): sunshine全成立无mid-flow死端; 缺口集中终端态+边缘态. 已决: B1+B2全通关终端态 / C1弃局on-page retry / D1校验日志user-visible / F1降级exit / H1 Cl5 carry-over. 延Phase-4: A1/A2/C2/E1-E6/G1/G2/I1/N2.
+- 场景04复查: X3(D1传导outline Q1/Q8/carry-over)/X4(GS1 "双角色"->"passes/failures数据角色")已修; 画布态缺口[复查-C1]=决策A(per-level草稿=第3 IndexedDB store, auto-save CS1, #8 view/export/import/reset纳入, 3 store 3角色); 改ADR-6+04 outline/04.1+CS3+GS3+FS1=A+CS1. X1/X2随E1.
+- N1(画布态import信任边界): import信任边界2类(Zod schema+上限钳制)->3类, +画布态graph校验(nodes<=32[project-context L53规模封顶]/cards⊆unlocked[锁定决策6准入invariant,纯函数派生]/valid edges[NODES/E from-to引用现存node]); 改2 carry-over(04 outline+04.1)+传导4枚举位(Q1/Q8 outline+Page Purpose/On-Page 04.1, X3先例, Q7商业成功留shorthand); 耦合E4(import原子性all-or-nothing含画布态)+A2(per-track unlocked集选定); 无冲突(E4正交互补/解锁纯函数一致/nodes<=32既有).
+- 锁定决策增至8(+决策A手动提交校验).
+
+**Next (新窗口):** step-05 [N] 场景 02(选轨+首次上手, 页#1+#2, Suggest 8问, I1消解) -> C 序续 03 -> 全 4 场景 outline 完 [C] step-06 -> Phase 4 UX Design (Lovable render loop).
+### 2026-08-04 - Phase 3 step-05 场景 02 outline + 02.1 + 2轮10人模拟 + 复查 (Session 10, Freya)
+
+- 场景 02 (选轨+首次上手, C 序第3, P2) outline + 02.1 DONE: 页 #1 总览(三态 zero/progress/terminal[R6]) + #2 选角选轨. Suggest 模式 8 问.
+- I1 首玩 flow 消解: onboarding=mode(track-agnostic); profile 首玩关 auto-create=profile 不存在时[R1]+idempotent[R7].
+- Q1=A(Q2 lead O3 primary+O1启动) / Q2=A(Q8 step2 选角=选轨 paired 单步; skin-vs-slice Phase-4 open).
+- 2 轮 10 人模拟 R1-R11(修订后无回归): R1 auto-create条件/R2 pre-profile ephemeral/R3 #2两态/R4 entry bar难度明示(Cl1)/R5 Cl5扩02+always-on双语/R6 #1三态/R7 idempotent/R8 CS1传track+level/R9 paired UI/R10无forced default/R11 A1含首关所需牌.
+- 复查: C1 跨场景冲突(01 outline Q6+01.1 Entry 原'开应用落#3' vs 02 '#1 hub', 已修01 outline Q6+CS1+01.1 Entry/Q6/Purpose/Q3, 全扫零残留) / G1(01.1 缺first-time entry state, 已修+加Carry-overs section) / T1(R8->01.1 entry依赖传导) / T2(04.1 onboarding精化R1/R7) / T3(Cl1双facet:结构=01-core/display=02). index 同步(00-ux-scenarios.md 02 DONE+C序标签修正+Page Index+02.1). minor: 01.1 C1 note改述避旧词+T1记法统一.
+- 产物: C-UX-Scenarios/02-jaron-selects-track-onboards/ (outline+02.1) + 01 outline/01.1 修正 + 04.1 onboarding 精化 + 00-ux-scenarios.md index 同步 + project-memory §14 回写.
+- Phase-4 open 新增: profile.class双轨语义/改选转换 / skin-vs-slice character(feature#13) / entry bar难度量化 / terminal#2行为 / reset后onboarding re-trigger / auto-create字段集match CS3.
+
+**Next (新窗口):** step-05 [N] 场景 03(回顾架构与多云对比, 页#7, Suggest 8问, FS1=A 读passes-only) / [1] 补 02.2(#2 选角选轨 step) -> 全 4 场景 outline 完 [C] step-06 -> Phase 4 UX Design (Lovable render loop).
+### 2026-08-04 - Phase 3 step-05 场景 03 outline + 03.1 + 10人模拟 + S6 修法 (Session 11, Freya)
+
+- 场景 03 (回顾架构与多云对比, C 序第4, P2) outline + 03.1 DONE: 页 #7 对比记忆. Suggest 模式 8 问 + 3 处 review 展开.
+- Q2=O1 巩固层 (distinct 01 ENGINE / 02-04 O3 plumbing; forces 轴B+轴D=学习 outcome; Cl6 可跳过=aid 非 gate). 3 处按推荐: O1巩固 / 多云两层全愿景 MVP floor=轴B 轴D Phase-4 / 图谱映射结构半 outline 视觉半 Phase-4.
+- 10 人模拟 S1-S6(无回归): S1 zero-passes empty state / S2 passes store schema 依赖(graph+matched ref+WA carry CS3) / S3 多云 absent-state(Phase-4) / S4 terminal review(couples 01.4) / S5 01.4总结 vs #7review 边界(distinct) / S6 pass-write 时点+#4->#7 路径.
+- S6 修法[已传导 01.3]: pass 写 passes store at #4(validation=immediate record), decoupled from #6 XP award. #4 有 optional #7 exit(CS1 C2<->C3)+sunshine #6 exit. 改 01.3 carry-overs + 03 outline carry-over.
+- 确认无问题: Cl6 skip / CS1 C3<->C2 retry 画布态 restore / FS1=A read consistency / FS2 transient / CS6 / drafts-but-no-passes / 双语+Cl5.
+- 产物: C-UX-Scenarios/03-jaron-reviews-architecture-compares-clouds/ (outline+03.1) + 01.3 spec S6 传导 + 00-ux-scenarios.md index 同步 + project-memory §14 回写.
+- Phase-4 open 新增: 多云变体 MVP scope / 图谱映射粒度呈现 / #7 内容派生 / terminal review / absent-state / CN 概念锚 content.
+
+**Next (新窗口):** step-05 终态 [C] step-06(全 4 场景 outline 完, 02.2 待补可后补) / [1] 补 02.2(#2 选角选轨 step) / [2] start designing(Phase 4). [C] step-06 -> 生成 overview -> Phase 4 UX Design (Lovable render loop).
+
+### 2026-08-04 - Phase 3 step-06~08: overview + quality review + log (Session 12, Freya)
+
+- step-06 overview 生成: 00-ux-scenarios.md 重生成 (Scenario Summary 表[ID/Persona/Pages/Priority/C 序/Status] + 4 场景卡[链接+User/Business Value] + Page Coverage Matrix 8/8 + 非页表面 tracked + Page Spec Index + Next Phase[Lovable render loop]). 链接校验: 4/4 scenario outline 链接解析 0 断链; 8/8 页覆盖. 未改 scenario 文件(step-06 规则).
+- step-07 quality review: 4 场景全过 4 维度 (Complete 7/7 · Quality 7/7 · Mistakes 7/7[含 3.7 bloated] · Practices 4/4) = Excellent. 阈值全过 (min 6/7·5/7·7/7·2/4), 无需修法. 复核: Trigger 三元(折入 Q3 Situation)齐 / 4 路径线性零 if / 共享页一致(#1 hub 三态 / #4 pass->review exit) / 单 persona(4.2 由 01 P1 满足). tracked(非阻塞): 02.2 step spec 待补(Phase 4) / 03 business success 偏定性(过 2.3 栏).
+- step-08 log 回写: 本条目 + project-memory §14/header/§4 + resume-prompt 同步.
+- 产物(本会话): design-process/C-UX-Scenarios/00-ux-scenarios.md (overview 重生成).
+- Phase 3 全产物(12 文件): 00-ux-scenarios.md + 01-{outline,01.1-course-map,01.2-card-pool,01.3-canvas,01.4-xp-progression} + 02-{outline,02.1-overview} + 03-{outline,03.1-comparison-memory} + 04-{outline,04.1-profile-save}; 02.2-character-track-select/ 待补(Phase 4).
+- Phase 3 状态: step-01~08 done (4/4 outline + overview + quality review + log); 02.2 step spec 待补(Phase 4 可补, 不阻); step-09 handover 进行中(暂停于 design intent 选择).
+
+**Next (新窗口):** step-09 handover 进行中(暂停于 design intent 选择, 待用户选每场景 [K/C/S/D/L]) -> 写 4 scenario frontmatter(design_intent+design_status:not-started) + Phase 4 说明 + 标 complete + [M] -> Phase 4 UX Design (Lovable render loop, wds-4-ux-design, 设计循环从 scenario step 1 起: 01.1 课程地图 / 02.1 总览). 02.2(#2 选角选轨) 可随 Phase 4 scenario 02 起手补.
+
+### 2026-08-04 - Phase 3 step-09 handover 完成 -> Phase 4 (Session 13, Freya)
+
+- step-09 handover DONE: completion summary 呈交 + design intent 收齐(01=S, 04=S, 02=C, 03=C) + 4 scenario outline frontmatter 写入(design_intent + design_status:not-started, YAML 块置顶).
+- Phase 3 COMPLETE: step-01~09 全 done (4/4 outline + overview + quality review Excellent + handover). 02.2 step spec 待补(Phase 4 随 scenario 02 起手补, 不阻).
+- design intent rationale: 01/04=S(核心引擎+schema 锁护栏密, 逐页确认过 §13 四项检测/信任边界 N1); 02/03=C(#1 三态+#2 paired 选角 / #7 图谱->架构图映射, 人感+抽象记忆设计发力点共创).
+- 产物(本步): 4 scenario outline frontmatter 写入 + design-log/project-memory/resume-prompt 回写.
+
+**Next (新窗口):** Phase 4 UX Design (Lovable render loop, wds-4-ux-design). C 序 01->04->02->03, 设计循环从 scenario step 1 起(首站 01.1 课程地图). design_intent 01=S/04=S/02=C/03=C. 02.2(#2 选角选轨)随 scenario 02 起手补.
