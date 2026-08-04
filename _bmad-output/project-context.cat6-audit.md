@@ -43,7 +43,7 @@
 ### 带源文档 inline 标签的簇（2/12）
 | 簇 | cat6 位置 | 引用源 | 亲验结果 |
 |---|---|---|---|
-| A | cat6 簇A | `docs/swimlane-dev-history.md` 部署与维护机制(L99-110) + `docs/swimlane-design-rationale.md` §8 维护边界(L106-110) | 命中：orphan 隔离/worktree/git checkout/状态权威源 |
+| A | cat6 簇A | `docs/swimlane-dev-history.md` 部署与维护机制(L99-110) + `docs/swimlane-design-rationale.md` §8 维护边界(L106-110) | 命中：orphan 隔离/worktree/git checkout/状态权威源; 注: NewSD 仓库可直推, CloudTech GH013 需 PR(2026-08-04 实测修正, 见 conflicts-audit C6) |
 | H | cat6 簇H | `design-process/A-Product-Brief/01-product-brief.md` L97/126/236 + `design-process/_progress/project-memory.md` §8#10(L105) | 命中：render loop/渲染探针/spec<->render/拖拽×字符网格×响应式 |
 
 ### 隐式源（内容派生自源文档但散文未 inline 标注，9/12）

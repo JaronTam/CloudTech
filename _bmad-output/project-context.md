@@ -43,7 +43,7 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 ### 工具链
 - BMAD v6.10.0：`_bmad/`(tracked) + `.github/agents/`(tracked) + `.agents/skills/`(gitignored，可重装)
-- Git 分支：`main`(tracked) + `gh-pages`(orphan，仅 index.html，免 PR 直推) + `update-gh-pages-index`
+- Git 分支：`main`(tracked) + `gh-pages`(orphan，仅 index.html，需 PR via update-gh-pages-index) + `update-gh-pages-index`(过渡工作分支)
 
 ### 校验引擎规则
 - **规格语言多项式可校验（目标约束）**：参考架构规格限定为 label 集合包含 + edge 存在性 + constraints 打分，禁任意子图同构(NP-难)。**表达力待 Phase 3-4 验证**：能否表达"顺序(A 先于 B)"/"互斥(A/B 二选一)"？若需超多项式表达力，B1 退回 NP-难，重审规模封顶/启发式
@@ -174,7 +174,7 @@ _Per-category rules documented as each category is generated (step-02)._
 ### Development Workflow Rules
 
 #### 进度图工作流（site/index.html，gh-pages orphan，继承 NewSD 血统）
-- **Git 三分支 + gh-pages orphan 隔离**：main(tracked,Require-PR 保护) + gh-pages(orphan,仅 index.html,免 PR 直推) + update-gh-pages-index(过渡索引)。gh-pages orphan 与 main 源码隔离,不受 main 分支保护可直推(更新 CUR/status 无需走 PR);main 有改动时用 git worktree 检出隔离 Edit,main clean 时可直 git checkout gh-pages（provenance: docs/swimlane-dev-history.md 部署与维护机制 + docs/swimlane-design-rationale.md §8）
+- **Git 三分支 + gh-pages orphan 隔离**：main(tracked,Require-PR 保护) + gh-pages(orphan,仅 index.html,需 PR) + update-gh-pages-index(过渡工作分支)。gh-pages orphan 与 main 源码隔离,但受仓库规则保护(GH013: 必须通过 PR,不可直推);同步工作流=改 site/index.html -> 推 update-gh-pages-index(基于 gh-pages) -> PR -> merge gh-pages -> Pages 自动重建。检出隔离用 worktree(main 有改动时)或 checkout gh-pages(main clean),但推送必经 PR。原"免 PR 直推"表述已废(2026-08-04 GH013 实测修正)（provenance: 2026-08-04 push 实测 GH013 + origin/gh-pages 历史 Merge PR#1/#2; 原 NewSD swimlane docs 描述的直推=NewSD 仓库行为,CloudTech 不适用）
 - **部署 + 验证**：推 origin/gh-pages -> Pages 自动重建(1-2min)刷新 URL 验;本地 Playwright E2E(curCount 跨 hover 不变 / grab-to-pan / devhint / console 无 error)。gh-pages 仅 scoped 进度图,不夹产品代码
 - **批次声明工作流(核心)**：开发前声明当批并行故事 -> 同步 memory + project-context -> story 合并后 fold 单次 gh-pages 推送(NODES status todo->done + 设 CUR);story 代码 PR 仍每 story 单独(进度图 fold ≠ story PR)。批次粒度=单人开发会话/里程碑(非团队 sprint,NewSD sprint 概念适配单人)。声明须过 checklist(声明故事集+memory 同步+project-context 同步+CUR 设置),CI 校验完整(scaffold 后建 CI 时)
 - **状态权威源非图本身**：NODES status 跟随合并记录(PR merged)更新,图是展示层非真相源;合并 story 后改 NODES 第6项 todo->done 推 gh-pages,同周期,不夹带 story 代码 PR。严格 status 三态(done/todo/blocked):todo=入边全 done 立即可开发,blocked=有未完成硬前置或显式标阻塞;禁把 blocked 当 todo(devhint v1->v2 修正教训);数据驱动重算(IIFE 遍历 NODES/E)避手写第二处文本 stale
